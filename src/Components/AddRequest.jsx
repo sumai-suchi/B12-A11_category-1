@@ -2,12 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import PageTitle from "./PageTitle";
 import { AuthContext } from "../AuthContext/AuthContext";
 import axios from "axios";
-import useAxios from "../hooks/useAxios";
+
 import Swal from "sweetalert2";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const AddRequest = () => {
   const { user } = useContext(AuthContext);
-  const axiosInstance = useAxios();
+  const axiosSecure = useAxiosSecure();
+
   const [upazilas, setUpazilas] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [formData, setFormData] = useState({
@@ -49,7 +51,7 @@ const AddRequest = () => {
     console.log("Donation Request:", donationRequest);
 
     try {
-      const res = await axiosInstance.post(
+      const res = await axiosSecure.post(
         "/blood-donation-request",
         donationRequest
       );
