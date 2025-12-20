@@ -9,8 +9,16 @@ import {
   FaBars,
 } from "react-icons/fa";
 import SidebarLink from "../Components/SidebarLink";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext/AuthContext";
 
 const Dashboard = () => {
+  const { SignOut, role } = useContext(AuthContext);
+
+  const handleLogOut = () => {
+    SignOut();
+  };
+
   return (
     <div className="h-screen">
       {/* Mobile Topbar */}
@@ -66,16 +74,20 @@ const Dashboard = () => {
                 icon={<FaHome />}
                 label="Dashboard"
               />
-              <SidebarLink
-                to="/dashboard/add-request"
-                icon={<FaPlusCircle />}
-                label="Add Request"
-              />
-              <SidebarLink
-                to="/dashboard/all-users"
-                icon={<FaUsers />}
-                label="All Users"
-              />
+              {role == "donor" && (
+                <SidebarLink
+                  to="/dashboard/add-request"
+                  icon={<FaPlusCircle />}
+                  label="Add Request"
+                />
+              )}
+              {role == "admin" && (
+                <SidebarLink
+                  to="/dashboard/all-users"
+                  icon={<FaUsers />}
+                  label="All Users"
+                />
+              )}
               <SidebarLink
                 to="/dashboard/my-profile"
                 icon={<FaUser />}
@@ -85,7 +97,10 @@ const Dashboard = () => {
 
             {/* Footer */}
             <div className="border-t border-white/20 pt-4">
-              <button className="flex items-center gap-3 w-full px-4 py-2 rounded-lg hover:bg-white/20 transition">
+              <button
+                onClick={handleLogOut}
+                className="flex items-center gap-3 w-full px-4 py-2 rounded-lg hover:bg-white/20 transition"
+              >
                 <FaSignOutAlt />
                 Logout
               </button>

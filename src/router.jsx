@@ -6,6 +6,8 @@ import Login from "./Components/Login";
 import Register from "./Components/Register";
 import Dashboard from "./pages/Dashboard";
 import AddRequest from "./Components/AddRequest";
+import PrivateRoute from "./Components/PrivateRoute";
+import AllUser from "./Components/AllUser";
 
 const router = createBrowserRouter([
   {
@@ -34,11 +36,19 @@ const router = createBrowserRouter([
   },
   {
     path: "dashboard",
-    element: <Dashboard></Dashboard>,
+    element: (
+      <PrivateRoute>
+        <Dashboard></Dashboard>
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "add-request",
         element: <AddRequest></AddRequest>,
+      },
+      {
+        path: "all-users",
+        element: <AllUser></AllUser>,
       },
     ],
   },

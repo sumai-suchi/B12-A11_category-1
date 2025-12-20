@@ -1,18 +1,20 @@
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegUserCircle } from "react-icons/fa";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { AuthContext } from "../AuthContext/AuthContext";
 
 const Login = () => {
   const { SignIn } = useContext(AuthContext);
   const { register, handleSubmit } = useForm();
+  const navigate = useNavigate();
   const handleFromData = (data) => {
     console.log(data);
 
     SignIn(data?.email, data?.Password)
       .then((res) => {
         console.log(res?.user);
+        navigate("/");
       })
       .then((error) => {
         console.log(error);

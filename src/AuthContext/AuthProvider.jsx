@@ -14,11 +14,12 @@ import axios from "axios";
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(true);
   const [role, setRole] = useState("");
   console.log(user);
 
   const SignUpWithEmailPassword = (email, password) => {
-    // setLoading(true);
+    setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
@@ -38,6 +39,7 @@ const AuthProvider = ({ children }) => {
         console.log(res.data.role);
         setRole(res.data.role);
         console.log(role);
+        setRoleLoading(false);
       })
       .then((error) => {
         console.log(error);
@@ -69,6 +71,7 @@ const AuthProvider = ({ children }) => {
     loading,
     user,
     role,
+    roleLoading,
   };
   return (
     <AuthContext.Provider value={userInfo}>{children}</AuthContext.Provider>
