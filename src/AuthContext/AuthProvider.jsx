@@ -16,6 +16,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [roleLoading, setRoleLoading] = useState(true);
   const [role, setRole] = useState("");
+  const [userStatus, setUserStatus] = useState("");
   console.log(user);
 
   const SignUpWithEmailPassword = (email, password) => {
@@ -38,6 +39,7 @@ const AuthProvider = ({ children }) => {
       .then((res) => {
         console.log(res.data.role);
         setRole(res.data.role);
+        setUserStatus(res.data.status);
         console.log(role);
         setRoleLoading(false);
       })
@@ -72,6 +74,7 @@ const AuthProvider = ({ children }) => {
     user,
     role,
     roleLoading,
+    userStatus
   };
   return (
     <AuthContext.Provider value={userInfo}>{children}</AuthContext.Provider>

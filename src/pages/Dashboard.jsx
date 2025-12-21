@@ -81,6 +81,13 @@ const Dashboard = () => {
                   label="Add Request"
                 />
               )}
+              {role == "donor" && (
+                <SidebarLink
+                  to="/dashboard/my-donation-request"
+                  icon={<FaPlusCircle />}
+                  label="My Donation Request"
+                />
+              )}
               {role == "admin" && (
                 <SidebarLink
                   to="/dashboard/all-users"
