@@ -39,6 +39,17 @@ const DashboardHome = () => {
       console.log(error);
     }
   };
+
+  const handleDeleteOne = async (id) => {
+    try {
+      const res = await axiosSecure.delete(`/userRequest/${id}`);
+      setMyRequest((prevUsers) => prevUsers.filter((user) => user._id !== id));
+
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
       <div className="text-center px-4 ">
@@ -176,7 +187,11 @@ const DashboardHome = () => {
                       </NavLink>
                     </td>
                     <td>
-                      <button type="button" className="btn p-1 btn-error">
+                      <button
+                        onClick={() => handleDeleteOne(req._id)}
+                        type="button"
+                        className="btn p-1 btn-error"
+                      >
                         Delete
                       </button>
                     </td>
