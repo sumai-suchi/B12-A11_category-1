@@ -22,10 +22,13 @@ const Navbar = () => {
             <li>
               <NavLink to="/donation-requests">Donation Requests</NavLink>
             </li>
+            <li>
+              <NavLink to="/">Home</NavLink>
+            </li>
 
             {user && (
               <li>
-                <NavLink to="/funding">Funding</NavLink>
+                <NavLink to="/Donate">Funding</NavLink>
               </li>
             )}
 
@@ -55,12 +58,15 @@ const Navbar = () => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 font-medium">
           <li>
+            <NavLink to="/">Home</NavLink>
+          </li>
+          <li>
             <NavLink to="/DonationRequestBlood">Donation Requests</NavLink>
           </li>
 
           {user && (
             <li>
-              <NavLink to="/funding">Funding</NavLink>
+              <NavLink to="/Donate">Funding</NavLink>
             </li>
           )}
         </ul>
@@ -68,7 +74,7 @@ const Navbar = () => {
 
       <div className="navbar-end gap-2">
         {!user ? (
-          <NavLink to="/login" className="btn btn-sm btn-error text-white">
+          <NavLink to="/auth/login" className="btn btn-sm btn-error text-white">
             Login
           </NavLink>
         ) : (

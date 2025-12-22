@@ -17,11 +17,15 @@ import AllDonationRequest from "./Components/AllDonationRequest";
 import VolSection from "./Components/VolSection";
 import SearchDonner from "./Components/SearchDonner";
 import DonationRequestBlood from "./Components/DonationRequestBlood";
+import ErrorPage from "./Components/ErrorPage";
+import Donate from "./Components/Donate";
+import SuccessPage from "./Components/SuccessPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout></RootLayout>,
+    errorElement: <ErrorPage></ErrorPage>,
     children: [
       {
         path: "/",
@@ -32,15 +36,24 @@ const router = createBrowserRouter([
         element: <SearchDonner></SearchDonner>,
       },
       {
-
-        path:"DonationRequestBlood",
-        element:<DonationRequestBlood></DonationRequestBlood>
-      }
+        path: "DonationRequestBlood",
+        element: <DonationRequestBlood></DonationRequestBlood>,
+      },
+      {
+        path: "Donate",
+        element: <Donate></Donate>,
+      },
+      {
+        path: "/payment-success",
+        element: <SuccessPage></SuccessPage>,
+      },
     ],
   },
+
   {
     path: "auth",
     element: <AuthLayout></AuthLayout>,
+    errorElement: <ErrorPage></ErrorPage>,
     children: [
       {
         path: "login",
@@ -59,6 +72,7 @@ const router = createBrowserRouter([
         <Dashboard></Dashboard>
       </PrivateRoute>
     ),
+    errorElement: <ErrorPage></ErrorPage>,
     children: [
       {
         path: "/dashboard",

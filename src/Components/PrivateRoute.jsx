@@ -11,7 +11,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   if (!user || userStatus == "blocked") {
-    return <Navigate to={"/"}></Navigate>;
+    return <Navigate to={"/auth/login"}></Navigate>;
   }
   return children;
 };

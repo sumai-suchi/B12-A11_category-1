@@ -4,7 +4,7 @@ import Hero from "../../Components/Hero";
 
 const Home = () => {
   return (
-    <div>
+    <div className="h-full">
       <Hero></Hero>
       <FeaturedSection></FeaturedSection>
       <ContactUs></ContactUs>

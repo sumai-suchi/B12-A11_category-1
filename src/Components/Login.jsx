@@ -21,9 +21,11 @@ const Login = () => {
       });
   };
   return (
-    <div className="w-96 mx-auto my-11">
+    <div className="w-full p-6 lg:p-12 lg:w-96 mx-auto  p-12 bg-linear-to-br from-rose-100 via-white to-red-100">
       <div className="flex flex-col gap-4 ">
-        <h1 className="text-4xl font-extrabold ">SignIn with Account </h1>
+        <h1 className="text-xl lg:text-4xl font-extrabold ">
+          SignIn with Account{" "}
+        </h1>
 
         <FaRegUserCircle className="size-8" />
       </div>

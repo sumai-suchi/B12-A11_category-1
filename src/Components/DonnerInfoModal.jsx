@@ -1,8 +1,25 @@
 import { useContext } from "react";
 import { AuthContext } from "../AuthContext/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
-const DonnerInfoModal = () => {
+const DonnerInfoModal = ({ SingleData }) => {
   const { user } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
+
+  const handleStatus = async (_id, donationStatus) => {
+    console.log(donationStatus);
+    console.log(_id);
+
+    try {
+      const res = await axiosSecure.patch(
+        `/update/userRequest/status?id=${_id}&donationStatus=${donationStatus}`
+      );
+
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div>
       <label htmlFor="donor-modal" className="btn btn-error">
@@ -44,13 +61,17 @@ const DonnerInfoModal = () => {
           </form>
 
           <div className="modal-action justify-between mt-6">
-            <label htmlFor="donor-modal" className="btn btn-outline btn-error">
+            {/* <label htmlFor="donor-modal" className="btn btn-outline btn-error">
               Cancel
-            </label>
+            </label> */}
 
-            <button className="btn btn-error text-white">
+            <label
+              className="btn  btn-error text-white "
+              htmlFor="donor-modal"
+              onClick={() => handleStatus(SingleData?._id, "inprogress")}
+            >
               Confirm & Continue
-            </button>
+            </label>
           </div>
         </div>
       </div>

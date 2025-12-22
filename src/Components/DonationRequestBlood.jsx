@@ -1,15 +1,12 @@
 import { useEffect } from "react";
 import { useState } from "react";
-// import useAxiosSecure from "../hooks/useAxiosSecure";
-import { AuthContext } from "../AuthContext/AuthContext";
+
 import { NavLink } from "react-router";
-import { MdEdit } from "react-icons/md";
 
 import useAxios from "../hooks/useAxios";
 
 const DonationRequestBlood = () => {
   const axiosInstance = useAxios();
-  //   const { user } = useContext(AuthContext);
 
   const [MyRequest, setMyRequest] = useState([]);
   const [AllRequest, setAllRequest] = useState([]);
@@ -28,13 +25,13 @@ const DonationRequestBlood = () => {
   console.log(MyRequest);
 
   return (
-    <div>
+    <div className="h-full">
       <div className="p-4 bg-base-100 rounded-lg shadow-md ">
         <h2 className="text-xl font-bold text-red-600 mb-4">
           🩸 My Donation Requests
         </h2>
 
-        <div className="h-full py-8 h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
+        <div className="h-full h-screen py-8 h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
           <div className="p-4 bg-base-100 rounded-lg shadow-md ">
             <div className="lg:hidden space-y-4">
               {MyRequest.length > 0 ? (

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
 import {
   FaUser,
   FaUsers,
@@ -118,6 +118,12 @@ const Dashboard = () => {
 
             {/* Footer */}
             <div className="border-t border-white/20 pt-4">
+              <NavLink
+                to={"/"}
+                className="flex items-center gap-3 w-full px-4 py-2 rounded-lg hover:bg-white/20 transition"
+              >
+                Go Home
+              </NavLink>
               <button
                 onClick={handleLogOut}
                 className="flex items-center gap-3 w-full px-4 py-2 rounded-lg hover:bg-white/20 transition"

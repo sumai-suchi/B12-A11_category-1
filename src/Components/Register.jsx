@@ -89,9 +89,12 @@ const Register = () => {
     }
   };
   return (
-    <div className="w-96 mx-auto my-11">
+    <div className="w-full p-6 lg:p-12 lg:w-96 mx-auto my-11 bg-linear-to-br from-rose-100 via-white to-red-100 ">
       <div className="flex flex-col gap-4 ">
-        <h1 className="text-4xl font-extrabold "> Register Account </h1>
+        <h1 className="text-xl lg:text-4xl font-extrabold ">
+          {" "}
+          Register Account{" "}
+        </h1>
 
         <FaRegUserCircle className="size-8" />
       </div>
@@ -211,10 +214,10 @@ const Register = () => {
           <div>
             <a className="link link-hover">Forgot password?</a>
           </div>
-          <button className="btn bg-primary mt-4">Register</button>
+          <button className="btn  mt-4 ">Register</button>
         </fieldset>
       </form>
-      <p className="text-[#71717A]">
+      <p className="text-[#71717A] ">
         already have an account ? <span className="text-primary">Login</span>
       </p>
     </div>
