@@ -16,6 +16,7 @@ import Profile from "./Components/Profile";
 import AllDonationRequest from "./Components/AllDonationRequest";
 import VolSection from "./Components/VolSection";
 import SearchDonner from "./Components/SearchDonner";
+import DonationRequestBlood from "./Components/DonationRequestBlood";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,11 @@ const router = createBrowserRouter([
         path: "searchDonner",
         element: <SearchDonner></SearchDonner>,
       },
+      {
+
+        path:"DonationRequestBlood",
+        element:<DonationRequestBlood></DonationRequestBlood>
+      }
     ],
   },
   {

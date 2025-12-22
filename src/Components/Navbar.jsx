@@ -10,9 +10,7 @@ const Navbar = () => {
   };
   return (
     <div className="navbar bg-base-100 shadow-md px-4">
-      {/* Left Section */}
       <div className="navbar-start">
-        {/* Mobile Menu */}
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost lg:hidden">
             ☰
@@ -48,18 +46,16 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {/* Logo */}
         <NavLink to="/" className="flex items-center gap-2">
           <span className="text-2xl">🩸</span>
           <span className="text-xl font-bold text-red-600">BloodCare</span>
         </NavLink>
       </div>
 
-      {/* Center Section (Desktop) */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 font-medium">
           <li>
-            <NavLink to="/donation-requests">Donation Requests</NavLink>
+            <NavLink to="/DonationRequestBlood">Donation Requests</NavLink>
           </li>
 
           {user && (
@@ -70,7 +66,6 @@ const Navbar = () => {
         </ul>
       </div>
 
-      {/* Right Section */}
       <div className="navbar-end gap-2">
         {!user ? (
           <NavLink to="/login" className="btn btn-sm btn-error text-white">

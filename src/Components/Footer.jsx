@@ -4,7 +4,7 @@ import {
   FaInstagram,
   FaPhoneAlt,
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 const Footer = () => {
   return (

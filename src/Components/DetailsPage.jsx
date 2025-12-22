@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import { useEffect, useState } from "react";
+import DonnerInfoModal from "./DonnerInfoModal";
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -124,11 +125,13 @@ const DetailsPage = () => {
             Request Message
           </h2>
 
-          <div className="bg-red-50 border border-red-200 p-5 rounded-lg">
+          <div className="bg-red-50 border mb-8 border-red-200 p-5 rounded-lg">
             <p className="text-gray-700 leading-relaxed">
               {SingleData?.requestMessage}
             </p>
           </div>
+
+          <DonnerInfoModal SingleData={SingleData}></DonnerInfoModal>
         </div>
       </div>
     </div>
