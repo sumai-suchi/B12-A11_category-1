@@ -73,7 +73,6 @@ const MyDonationRequest = () => {
         🩸 My Donation Requests
       </h2>
 
-      {/* Filter */}
       <div className="mb-4 flex flex-wrap gap-2">
         {["all", "pending", "inprogress", "done", "canceled"].map((status) => (
           <button
@@ -88,7 +87,6 @@ const MyDonationRequest = () => {
         ))}
       </div>
 
-      {/* Table */}
       <div className="h-full py-8 h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
         <div className="p-4 bg-base-100 rounded-lg shadow-md ">
           <div className="lg:hidden space-y-4">
@@ -99,7 +97,6 @@ const MyDonationRequest = () => {
                   className="card bg-base-100 shadow-md border border-red-100"
                 >
                   <div className="card-body p-4 space-y-2">
-                    {/* Header */}
                     <div className="flex justify-between items-center">
                       <h2 className="font-bold text-lg text-red-600">
                         {req.recipientName}
@@ -109,7 +106,6 @@ const MyDonationRequest = () => {
                       </span>
                     </div>
 
-                    {/* Info */}
                     <p className="text-sm">
                       <span className="font-semibold">Hospital:</span>{" "}
                       {req.hospitalName}
@@ -130,7 +126,6 @@ const MyDonationRequest = () => {
                       {req.donationTime}
                     </p>
 
-                    {/* Status */}
                     <div>
                       <span
                         className={`badge ${
@@ -147,7 +142,6 @@ const MyDonationRequest = () => {
                       </span>
                     </div>
 
-                    {/* Donor Info (only in progress) */}
                     {req.donationStatus === "inprogress" && (
                       <div className="bg-gray-100 p-2 rounded-md text-sm">
                         <p className="font-semibold">{req.requesterName}</p>
@@ -155,7 +149,6 @@ const MyDonationRequest = () => {
                       </div>
                     )}
 
-                    {/* Actions */}
                     <div className="flex flex-wrap gap-2 mt-3">
                       {req.donationStatus === "inprogress" && (
                         <>
@@ -333,7 +326,6 @@ const MyDonationRequest = () => {
             </table>
           </div>
         </div>
-       
       </div>
     </div>
   );

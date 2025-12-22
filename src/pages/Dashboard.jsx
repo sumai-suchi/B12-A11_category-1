@@ -96,7 +96,7 @@ const Dashboard = () => {
                 />
               )}
               <SidebarLink
-                to="/dashboard/my-profile"
+                to="/dashboard/profile"
                 icon={<FaUser />}
                 label="My Profile"
               />

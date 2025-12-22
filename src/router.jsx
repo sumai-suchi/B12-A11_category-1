@@ -12,6 +12,7 @@ import MyDonationRequest from "./Components/MyDonationRequest";
 import DashboardHome from "./Components/DashboardHome";
 import RequestDetailsPage from "./Components/RequestDetailsPage";
 import DetailsPage from "./Components/DetailsPage";
+import Profile from "./Components/Profile";
 
 const router = createBrowserRouter([
   {
@@ -70,7 +71,10 @@ const router = createBrowserRouter([
         path: "donation-details-page/:id",
         element: <DetailsPage></DetailsPage>,
       },
-
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      },
     ],
   },
 ]);
