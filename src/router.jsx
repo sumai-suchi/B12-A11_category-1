@@ -13,6 +13,9 @@ import DashboardHome from "./Components/DashboardHome";
 import RequestDetailsPage from "./Components/RequestDetailsPage";
 import DetailsPage from "./Components/DetailsPage";
 import Profile from "./Components/Profile";
+import AllDonationRequest from "./Components/AllDonationRequest";
+import VolSection from "./Components/VolSection";
+import SearchDonner from "./Components/SearchDonner";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home></Home>,
+      },
+      {
+        path: "searchDonner",
+        element: <SearchDonner></SearchDonner>,
       },
     ],
   },
@@ -74,6 +81,14 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile></Profile>,
+      },
+      {
+        path: "all-donation-request",
+        element: <AllDonationRequest></AllDonationRequest>,
+      },
+      {
+        path: "all-donation-request-volunteer",
+        element: <VolSection></VolSection>,
       },
     ],
   },

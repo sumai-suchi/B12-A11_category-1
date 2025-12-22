@@ -95,6 +95,20 @@ const Dashboard = () => {
                   label="All Users"
                 />
               )}
+              {role == "admin" && (
+                <SidebarLink
+                  to="/dashboard/all-donation-request"
+                  icon={<FaUsers />}
+                  label="All Donation Request"
+                />
+              )}
+              {role == "volunteer" && (
+                <SidebarLink
+                  to="/dashboard/all-donation-request-volunteer"
+                  icon={<FaUsers />}
+                  label="All Donation Request"
+                />
+              )}
               <SidebarLink
                 to="/dashboard/profile"
                 icon={<FaUser />}

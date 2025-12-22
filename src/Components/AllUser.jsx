@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import { AuthContext } from "../AuthContext/AuthContext";
 
 const AllUser = () => {
+  const { user: newUser } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
+
+  console.log(newUser?.email);
   const [AllUsers, setAllUsers] = useState([]);
+  const [recentUser, setRecentUser] = useState({});
+  console.log(recentUser);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,6 +19,15 @@ const AllUser = () => {
     fetchData();
   }, [axiosSecure]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await axiosSecure.get(`/user/role/data/${newUser?.email}`);
+      console.log(res.data);
+      setRecentUser(res.data);
+    };
+    fetchData();
+  }, [axiosSecure, newUser?.email]);
+
   const handleChangeStatus = async (email, status) => {
     const res = await axiosSecure.patch(
       `/update/user/status?email=${email}&status=${status}`
@@ -21,6 +36,18 @@ const AllUser = () => {
       prevUsers.map((user) =>
         user.email === email ? { ...user, status } : user
       )
+    );
+    console.log(res.data);
+  };
+
+  const handleStatus = async (email, role) => {
+    console.log(role);
+
+    const res = await axiosSecure.patch(
+      `/update/user/role?email=${email}&role=${role}`
+    );
+    setAllUsers((prevUsers) =>
+      prevUsers.map((user) => (user.email === email ? { ...user, role } : user))
     );
     console.log(res.data);
   };
@@ -61,11 +88,84 @@ const AllUser = () => {
                 <div className="stat-value text-sm">{user.upazila}</div>
               </div>
 
-              <div className="stat bg-base-200 rounded-xl col-span-2">
-                <div className="stat-title">Joined</div>
-                <div className="stat-value text-sm">
-                  {new Date(user.createdAt).toLocaleDateString()}
+              <div className="flex gap-2 justify-center items-center">
+                <div className="stat bg-base-200 rounded-xl col-span-2">
+                  <div className="stat-title">Joined</div>
+                  <div className="stat-value text-sm">
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </div>
                 </div>
+                <div>
+                  {user?.status === "active" ? (
+                    <button
+                      className="badge badge-success cursor-pointer"
+                      onClick={() => handleChangeStatus(user?.email, "blocked")}
+                    >
+                      Block
+                    </button>
+                  ) : (
+                    <button
+                      className="badge badge-warning cursor-pointer"
+                      onClick={() => handleChangeStatus(user?.email, "active")}
+                    >
+                      Activate
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                {recentUser?.role === "admin" && (
+                  <td>
+                    <div className="dropdown dropdown-start">
+                      <div tabIndex={0} role="button" className="btn m-1">
+                        make
+                      </div>
+                      <ul
+                        tabIndex="-1"
+                        className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                      >
+                        <li>
+                          <button
+                            onClick={() =>
+                              handleStatus(user?.email, "volunteer")
+                            }
+                          >
+                            volunteer
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => handleStatus(user?.email, "admin")}
+                          >
+                            admin
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                )}
+
+                {recentUser?.role === "volunteer" && (
+                  <td>
+                    <div className="dropdown dropdown-start">
+                      <div tabIndex={0} role="button" className="btn m-1">
+                        make
+                      </div>
+                      <ul
+                        tabIndex="-1"
+                        className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                      >
+                        <li>
+                          <button>volunteer</button>
+                        </li>
+                        <li>
+                          <button>admin</button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                )}
               </div>
             </div>
           </div>
@@ -144,6 +244,57 @@ const AllUser = () => {
                       </button>
                     )}
                   </td>
+
+                  {recentUser?.role === "admin" && (
+                    <td>
+                      <div className="dropdown dropdown-start">
+                        <div tabIndex={0} role="button" className="btn m-1">
+                          make
+                        </div>
+                        <ul
+                          tabIndex="-1"
+                          className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                        >
+                          <li>
+                            <button
+                              onClick={() =>
+                                handleStatus(user?.email, "volunteer")
+                              }
+                            >
+                              volunteer
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => handleStatus(user?.email, "admin")}
+                            >
+                              admin
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  )}
+                  {recentUser?.role === "volunteer" && (
+                    <td>
+                      <div className="dropdown dropdown-start">
+                        <div tabIndex={0} role="button" className="btn m-1">
+                          make
+                        </div>
+                        <ul
+                          tabIndex="-1"
+                          className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                        >
+                          <li>
+                            <button>volunteer</button>
+                          </li>
+                          <li>
+                            <button>admin</button>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  )}
                 </tr>
 
                 <tr>

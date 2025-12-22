@@ -9,50 +9,105 @@ const Navbar = () => {
     SignOut();
   };
   return (
-    <div>
-      <div className="navbar bg-base-100 shadow-sm">
-        <div className="navbar-start">
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {" "}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h8m-8 6h16"
-                />{" "}
-              </svg>
-            </div>
-            <ul
-              tabIndex="-1"
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-            >
-              <NavLink to={"dashboard"}>Dashboard</NavLink>
-            </ul>
-          </div>
-          <a className="btn btn-ghost text-xl">daisyUI</a>
-        </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">
+    <div className="navbar bg-base-100 shadow-md px-4">
+      {/* Left Section */}
+      <div className="navbar-start">
+        {/* Mobile Menu */}
+        <div className="dropdown">
+          <label tabIndex={0} className="btn btn-ghost lg:hidden">
+            ☰
+          </label>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+          >
             <li>
-              <NavLink to={"dashboard"}> Dashboard</NavLink>
+              <NavLink to="/donation-requests">Donation Requests</NavLink>
             </li>
+
+            {user && (
+              <li>
+                <NavLink to="/funding">Funding</NavLink>
+              </li>
+            )}
+
+            {!user ? (
+              <li>
+                <NavLink to="/login">Login</NavLink>
+              </li>
+            ) : (
+              <>
+                <li>
+                  <NavLink to="/dashboard">Dashboard</NavLink>
+                </li>
+                <li>
+                  <button onClick={handleSignOut}>Logout</button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
-        <div className="navbar-end">
-          {user ? (
-            <button onClick={handleSignOut}>LogOut</button>
-          ) : (
-            <NavLink to={"/auth/login"}>Login</NavLink>
+
+        {/* Logo */}
+        <NavLink to="/" className="flex items-center gap-2">
+          <span className="text-2xl">🩸</span>
+          <span className="text-xl font-bold text-red-600">BloodCare</span>
+        </NavLink>
+      </div>
+
+      {/* Center Section (Desktop) */}
+      <div className="navbar-center hidden lg:flex">
+        <ul className="menu menu-horizontal px-1 font-medium">
+          <li>
+            <NavLink to="/donation-requests">Donation Requests</NavLink>
+          </li>
+
+          {user && (
+            <li>
+              <NavLink to="/funding">Funding</NavLink>
+            </li>
           )}
-        </div>
+        </ul>
+      </div>
+
+      {/* Right Section */}
+      <div className="navbar-end gap-2">
+        {!user ? (
+          <NavLink to="/login" className="btn btn-sm btn-error text-white">
+            Login
+          </NavLink>
+        ) : (
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full ring ring-red-400 ring-offset-2">
+                <img
+                  src={
+                    user?.photoURL ||
+                    "https://i.ibb.co/PZqXd0qh/student-with-book-pen-library.png"
+                  }
+                  alt="user"
+                />
+              </div>
+            </label>
+
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li className="px-3 py-1 text-sm text-gray-500">
+                {user?.displayName || "User"}
+              </li>
+              <li>
+                <NavLink to="/dashboard">Dashboard</NavLink>
+              </li>
+              <li>
+                <button onClick={handleSignOut} className="text-red-500">
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
