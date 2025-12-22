@@ -51,7 +51,7 @@ const DashboardHome = () => {
     }
   };
   return (
-    <div className="h-full py-8 lg:h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
+    <div className="h-full py-8 h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
       <div className="text-center px-4 ">
         <h1
           className="
@@ -194,7 +194,7 @@ const DashboardHome = () => {
           )}
         </div>
 
-        <div className="hidden lg:block overflow-x-auto">
+        <div className="hidden lg:block h-full overflow-x-auto">
           <table className="table table-zebra w-full">
             <thead>
               <tr>
