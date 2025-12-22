@@ -1,5 +1,7 @@
 const SearchDonner = () => {
-  return <div></div>;
+  return <div>
+    <h1>SearchDonner</h1>
+  </div>;
 };
 
 export default SearchDonner;

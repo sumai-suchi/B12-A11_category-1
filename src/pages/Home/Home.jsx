@@ -1,9 +1,13 @@
-import React from "react";
+import ContactUs from "../../Components/ContactUs";
+import FeaturedSection from "../../Components/FeaturedSection";
+import Hero from "../../Components/Hero";
 
 const Home = () => {
   return (
     <div>
-      <h1>This is home</h1>
+      <Hero></Hero>
+      <FeaturedSection></FeaturedSection>
+      <ContactUs></ContactUs>
     </div>
   );
 };
