@@ -51,7 +51,7 @@ const DashboardHome = () => {
     }
   };
   return (
-    <div className="h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
+    <div className="h-full py-8 lg:h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
       <div className="text-center px-4 ">
         <h1
           className="
@@ -81,23 +81,120 @@ const DashboardHome = () => {
           🩸 My Donation Requests
         </h2>
 
-        {/* Filter */}
-        {/* <div className="mb-4 flex flex-wrap gap-2">
-        {["all", "pending", "inprogress", "done", "canceled"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`btn btn-sm ${
-              statusFilter === status ? "btn-primary" : "btn-outline"
-            } capitalize`}
-          >
-            {status}
-          </button>
-        ))}
-      </div> */}
+        <div className="lg:hidden space-y-4">
+          {MyRequest.length > 0 ? (
+            MyRequest.map((req) => (
+              <div
+                key={req._id}
+                className="card bg-base-100 shadow-md border border-red-100"
+              >
+                <div className="card-body p-4 space-y-2">
+                  {/* Header */}
+                  <div className="flex justify-between items-center">
+                    <h2 className="font-bold text-lg text-red-600">
+                      {req.recipientName}
+                    </h2>
+                    <span className="badge badge-error">{req.bloodGroup}</span>
+                  </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+                  {/* Info */}
+                  <p className="text-sm">
+                    <span className="font-semibold">Hospital:</span>{" "}
+                    {req.hospitalName}
+                  </p>
+
+                  <p className="text-sm">
+                    <span className="font-semibold">Address:</span>{" "}
+                    {req.address}, {req.upazila}, {req.district}
+                  </p>
+
+                  <p className="text-sm">
+                    <span className="font-semibold">Date:</span>{" "}
+                    {req.donationDate}
+                  </p>
+
+                  <p className="text-sm">
+                    <span className="font-semibold">Time:</span>{" "}
+                    {req.donationTime}
+                  </p>
+
+                  {/* Status */}
+                  <div>
+                    <span
+                      className={`badge ${
+                        req.donationStatus === "pending"
+                          ? "badge-warning"
+                          : req.donationStatus === "inprogress"
+                          ? "badge-info"
+                          : req.donationStatus === "done"
+                          ? "badge-success"
+                          : "badge-error"
+                      } capitalize`}
+                    >
+                      {req.donationStatus}
+                    </span>
+                  </div>
+
+                  {/* Donor Info (only in progress) */}
+                  {req.donationStatus === "inprogress" && (
+                    <div className="bg-gray-100 p-2 rounded-md text-sm">
+                      <p className="font-semibold">{req.requesterName}</p>
+                      <p>{req.requesterEmail}</p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {req.donationStatus === "inprogress" && (
+                      <>
+                        <button
+                          onClick={() => handleStatus("done", req._id)}
+                          className="btn btn-success btn-sm"
+                        >
+                          Done
+                        </button>
+
+                        <button
+                          onClick={() => handleStatus("cancel", req._id)}
+                          className="btn btn-error btn-sm"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    )}
+
+                    <NavLink
+                      to={`/dashboard/donation-request-details-page/${req._id}`}
+                      className="btn btn-sm bg-black text-white"
+                    >
+                      <MdEdit />
+                    </NavLink>
+
+                    <NavLink
+                      to={`donation-details-page/${req._id}`}
+                      className="btn btn-sm bg-green-800 text-white"
+                    >
+                      Details
+                    </NavLink>
+
+                    <button
+                      onClick={() => handleDeleteOne(req._id)}
+                      className="btn btn-error btn-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">
+              No donation requests found.
+            </p>
+          )}
+        </div>
+
+        <div className="hidden lg:block overflow-x-auto">
           <table className="table table-zebra w-full">
             <thead>
               <tr>
@@ -196,12 +293,14 @@ const DashboardHome = () => {
                       </button>
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        className="btn p-1 bg-green-900 text-white"
-                      >
-                        details
-                      </button>
+                      <NavLink to={`donation-details-page/${req._id}`}>
+                        <button
+                          type="button"
+                          className="btn p-1 bg-green-900 text-white"
+                        >
+                          details
+                        </button>
+                      </NavLink>
                     </td>
                   </tr>
                 ))
@@ -215,6 +314,14 @@ const DashboardHome = () => {
             </tbody>
           </table>
         </div>
+      </div>
+      <div className="flex justify-center items-center mt-8">
+        <NavLink
+          to={`/dashboard/my-donation-request`}
+          className="btn bg-red-500 text-white "
+        >
+          View all my donation request
+        </NavLink>
       </div>
     </div>
   );
