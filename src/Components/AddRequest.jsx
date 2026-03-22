@@ -1,17 +1,75 @@
 import { useContext, useEffect, useState } from "react";
-import PageTitle from "./PageTitle";
 import { AuthContext } from "../AuthContext/AuthContext";
-import axios from "axios";
-
 import Swal from "sweetalert2";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { Listbox } from "@headlessui/react";
 
+/* ================= Floating Input ================= */
+const FloatingInput = ({ label, name, value, onChange, type = "text", readOnly = false }) => {
+  return (
+    <div className="relative">
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        required={!readOnly}
+        readOnly={readOnly}
+        placeholder=" "
+        className="peer w-full p-4 pt-6 rounded-xl bg-white/20 border border-white/40 text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition"
+      />
+      <label className="absolute left-4 top-2 text-sm text-white/80 transition-all 
+        peer-placeholder-shown:top-4 
+        peer-placeholder-shown:text-base 
+        peer-placeholder-shown:text-white/60
+        peer-focus:top-2 peer-focus:text-sm peer-focus:text-white">
+        {label}
+      </label>
+    </div>
+  );
+};
+
+/* ================= Floating Select ================= */
+const FloatingSelect = ({ label, value, setValue, options }) => {
+  return (
+    <div className="relative">
+      <Listbox value={value} onChange={setValue}>
+        <div className="relative">
+          <Listbox.Button className="w-full p-4 pt-6 rounded-xl bg-white/20 border border-white/40 text-white text-left">
+            {value || label}
+          </Listbox.Button>
+
+          <Listbox.Options className="absolute mt-2 w-full bg-white rounded-xl shadow-lg max-h-60 overflow-auto z-50">
+            {options.map((opt, i) => (
+              <Listbox.Option
+                key={i}
+                value={opt}
+                className="cursor-pointer px-4 py-2 text-black hover:bg-red-100"
+              >
+                {opt}
+              </Listbox.Option>
+            ))}
+          </Listbox.Options>
+        </div>
+      </Listbox>
+
+      <label className="absolute left-4 top-2 text-sm text-white/80">
+        {label}
+      </label>
+    </div>
+  );
+};
+
+/* ================= Main Component ================= */
 const AddRequest = () => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
 
   const [upazilas, setUpazilas] = useState([]);
   const [districts, setDistricts] = useState([]);
+
   const [formData, setFormData] = useState({
     recipientName: "",
     district: "",
@@ -25,18 +83,15 @@ const AddRequest = () => {
   });
 
   useEffect(() => {
-    axios.get("/upazila.json").then((res) => {
-      setUpazilas(res.data.upazilas);
-    });
-    axios.get("/districts.json").then((res) => {
-      setDistricts(res.data.districts);
-    });
+    axios.get("/upazila.json").then(res => setUpazilas(res.data.upazilas));
+    axios.get("/districts.json").then(res => setDistricts(res.data.districts));
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -48,314 +103,131 @@ const AddRequest = () => {
       createdAt: new Date(),
     };
 
-    console.log("Donation Request:", donationRequest);
-
     try {
-      const res = await axiosSecure.post(
-        "/blood-donation-request",
-        donationRequest
-      );
-      console.log(res.data);
+      const res = await axiosSecure.post("/blood-donation-request", donationRequest);
       if (res.data.insertedId) {
         Swal.fire({
-          title: "Donation request added successfully!",
+          title: "Request Added!",
+          text: "Blood donation request submitted successfully",
           icon: "success",
-          draggable: true,
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
+
   return (
-    <div
-      className="min-h-full w-full flex items-center justify-center 
-                    bg-linear-to-br from-red-900 via-black to-red-800 
-                    px-3 sm:px-6 py-6"
-    >
-      <div
-        className="w-full max-w-4xl 
-                      bg-black/50 backdrop-blur-xl 
-                      border border-red-500/30 
-                      rounded-2xl shadow-2xl 
-                      p-4 sm:p-6 md:p-8 
-                      text-gray-100"
+    <div className="relative min-h-screen flex items-center justify-center px-4">
+
+      {/* ✅ Static Background */}
+      <img
+        src="/BloodDonationImg.png"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/50"></div>
+
+      {/* 💎 Glass Form */}
+      <motion.div
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative w-full max-w-5xl bg-white/20 backdrop-blur-xl border border-white/30 p-10 rounded-3xl shadow-2xl"
       >
-        {/* Title */}
-        <h2
-          className="text-2xl sm:text-3xl font-bold text-center mb-6
-                       bg-linear-to-r from-red-400 to-red-600 
-                       bg-clip-text text-transparent"
-        >
+        <h2 className="text-3xl font-bold text-white text-center mb-10">
           Blood Donation Request
         </h2>
 
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5"
-        >
-          {/* Requester Name */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Requester Name
-              </span>
-            </label>
-            <input
-              type="text"
-              value={user?.displayName || ""}
-              readOnly
-              className="input input-bordered w-full 
-                         bg-black/60 text-gray-200 
-                         border-gray-600"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
 
-          {/* Requester Email */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Requester Email
-              </span>
-            </label>
-            <input
-              type="email"
-              value={user?.email || ""}
-              readOnly
-              className="input input-bordered w-full 
-                         bg-black/60 text-gray-200 
-                         border-gray-600"
-            />
-          </div>
+          {/* User Info */}
+          <FloatingInput label="Requester Name" value={user?.displayName || ""} readOnly />
+          <FloatingInput label="Requester Email" value={user?.email || ""} readOnly />
 
-          {/* Recipient Name */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Recipient Name
-              </span>
-            </label>
-            <input
-              type="text"
-              name="recipientName"
-              value={formData.recipientName}
-              onChange={handleChange}
-              placeholder="Enter recipient name"
-              required
-              className="input input-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         placeholder-gray-400 
-                         border-gray-600 
-                         focus:border-red-500"
-            />
-          </div>
+          {/* Inputs */}
+          <FloatingInput
+            label="Recipient Name"
+            name="recipientName"
+            value={formData.recipientName}
+            onChange={handleChange}
+          />
 
-          {/* Blood Group */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Blood Group
-              </span>
-            </label>
-            <select
-              name="bloodGroup"
-              value={formData.bloodGroup}
-              onChange={handleChange}
-              required
-              className="select select-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         border-gray-600 
-                         focus:border-red-500"
-            >
-              <option value="" disabled className="text-white">
-                Select Blood Group
-              </option>
-              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
-                <option key={bg} value={bg} className="text-white">
-                  {bg}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FloatingSelect
+            label="Blood Group"
+            value={formData.bloodGroup}
+            setValue={(val) => setFormData({ ...formData, bloodGroup: val })}
+            options={['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']}
+          />
 
-          {/* District */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Recipient District
-              </span>
-            </label>
-            <select
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-              required
-              className="select select-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         border-gray-600 
-                         focus:border-red-500"
-            >
-              <option value="" disabled className="text-white">
-                Select District
-              </option>
-              {districts.map((u) => (
-                <option key={u.id} value={u.name}>
-                  {u.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FloatingSelect
+            label="District"
+            value={formData.district}
+            setValue={(val) => setFormData({ ...formData, district: val })}
+            options={districts.map(d => d.name)}
+          />
 
-          {/* Upazila */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Recipient Upazila
-              </span>
-            </label>
-            <select
-              name="upazila"
-              value={formData.upazila}
-              onChange={handleChange}
-              required
-              className="select select-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         border-gray-600 
-                         focus:border-red-500"
-            >
-              <option value="" disabled className="text-white">
-                Select Upazila
-              </option>
-              {upazilas.map((u) => (
-                <option key={u.id} value={u.name}>
-                  {u.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FloatingSelect
+            label="Upazila"
+            value={formData.upazila}
+            setValue={(val) => setFormData({ ...formData, upazila: val })}
+            options={upazilas.map(u => u.name)}
+          />
 
-          {/* Hospital */}
-          <div className="lg:col-span-2">
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Hospital Name
-              </span>
-            </label>
-            <input
-              type="text"
-              name="hospitalName"
-              value={formData.hospitalName}
-              onChange={handleChange}
-              placeholder="Dhaka Medical College Hospital"
-              required
-              className="input input-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         placeholder-gray-400 
-                         border-gray-600 
-                         focus:border-red-500"
-            />
-          </div>
+          <FloatingInput
+            label="Hospital Name"
+            name="hospitalName"
+            value={formData.hospitalName}
+            onChange={handleChange}
+          />
 
-          {/* Address */}
-          <div className="lg:col-span-2">
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Full Address
-              </span>
-            </label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Zahir Raihan Rd, Dhaka"
-              required
-              className="input input-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         placeholder-gray-400 
-                         border-gray-600 
-                         focus:border-red-500"
-            />
-          </div>
+          <FloatingInput
+            label="Full Address"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+          />
 
-          {/* Date */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Donation Date
-              </span>
-            </label>
-            <input
-              type="date"
-              name="donationDate"
-              value={formData.donationDate}
-              onChange={handleChange}
-              required
-              className="input input-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         border-gray-600 
-                         focus:border-red-500"
-            />
-          </div>
+          <FloatingInput
+            type="date"
+            name="donationDate"
+            value={formData.donationDate}
+            onChange={handleChange}
+            label="Donation Date"
+          />
 
-          {/* Time */}
-          <div>
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Donation Time
-              </span>
-            </label>
-            <input
-              type="time"
-              name="donationTime"
-              value={formData.donationTime}
-              onChange={handleChange}
-              required
-              className="input input-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         border-gray-600 
-                         focus:border-red-500"
-            />
-          </div>
+          <FloatingInput
+            type="time"
+            name="donationTime"
+            value={formData.donationTime}
+            onChange={handleChange}
+            label="Donation Time"
+          />
 
           {/* Message */}
-          <div className="lg:col-span-2">
-            <label className="label">
-              <span className="label-text text-gray-200 font-medium">
-                Request Message
-              </span>
-            </label>
+          <div className="md:col-span-2 relative">
             <textarea
               name="requestMessage"
               value={formData.requestMessage}
               onChange={handleChange}
               rows={4}
-              required
-              placeholder="Explain why blood is needed in detail..."
-              className="textarea textarea-bordered w-full 
-                         bg-black/50 text-gray-100 
-                         placeholder-gray-400 
-                         border-gray-600 
-                         focus:border-red-500"
+              placeholder=" "
+              className="peer w-full p-4 pt-6 rounded-xl bg-white/20 border border-white/40 text-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
             />
+            <label className="absolute left-4 top-2 text-sm text-white/80 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-white/60 peer-focus:top-2 peer-focus:text-sm">
+              Request Message
+            </label>
           </div>
 
-          {/* Submit Button */}
-          <div className="lg:col-span-2 pt-2">
-            <button
-              type="submit"
-              className="btn w-full 
-                         bg-linear-to-r from-red-600 to-red-900 
-                         hover:from-red-500 hover:to-black 
-                         text-white text-lg 
-                         border-none shadow-lg 
-                         transition-all duration-300"
-            >
-              Submit Donation Request
-            </button>
-          </div>
+          {/* Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="md:col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg"
+          >
+            Submit Request
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

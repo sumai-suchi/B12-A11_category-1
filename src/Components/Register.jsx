@@ -1,225 +1,244 @@
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext/AuthContext";
 import axios from "axios";
-import { useNavigate } from "react-router";
-import { FaRegUserCircle } from "react-icons/fa";
-
+import { FaStethoscope } from "react-icons/fa";
+import { motion } from "framer-motion";
 const Register = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register: registerForm, handleSubmit, formState: { errors } } = useForm();
   const { SignUpWithEmailPassword, UpdateUser } = useContext(AuthContext);
-  console.log(SignUpWithEmailPassword);
   const navigate = useNavigate();
+
   const [upazilas, setUpazilas] = useState([]);
   const [districts, setDistricts] = useState([]);
 
   useEffect(() => {
-    axios.get("/upazila.json").then((res) => {
-      setUpazilas(res.data.upazilas);
-    });
-    axios.get("/districts.json").then((res) => {
-      setDistricts(res.data.districts);
-    });
+    axios.get("/upazila.json").then((res) => setUpazilas(res.data.upazilas));
+    axios.get("/districts.json").then((res) => setDistricts(res.data.districts));
   }, []);
-  console.log(upazilas, districts);
-  const handleFromData = async (data) => {
-    console.log(data.photoURL[0]);
 
-    const file = data.photoURL[0];
-    console.log(file);
+  const handleFormData = async (data) => {
+    try {
+      const file = data.photoURL[0];
+      const res = await axios.post(
+        `https://api.imgbb.com/1/upload?key=5badb61c303d075b3a4757bc1229a32b`,
+        { image: file },
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-    const res = await axios.post(
-      `https://api.imgbb.com/1/upload?key=5badb61c303d075b3a4757bc1229a32b`,
-      { image: file },
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      if (res.data.success) {
+        const mainPhotoUrl = res.data.data.display_url;
+
+        const formData = {
+          name: data.name,
+          email: data.email,
+          mainPhotoUrl,
+          bloodGroup: data.bloodGroup,
+          upazila: data.upazila,
+          districts: data.districts,
+        };
+        console.log(formData)
+
+        await SignUpWithEmailPassword(data.email, data.Password);
+        await UpdateUser({ displayName: data.name, photoURL: mainPhotoUrl });
+
+        await axios.post("http://localhost:5000/user", formData);
+        navigate("/");
       }
-    );
-
-    const mainPhotoUrl = res.data.data.display_url;
-    const name = data?.name;
-
-    const email = data?.email;
-    const bloodGroup = data?.bloodGroup;
-    const upazila = data?.upazila;
-    const districts = data?.districts;
-
-    const formData = {
-      name,
-      email,
-
-      mainPhotoUrl,
-      bloodGroup,
-      upazila,
-      districts,
-    };
-
-    console.log(formData);
-
-    if (res.data.success == true) {
-      SignUpWithEmailPassword(data.email, data.Password)
-        .then((res) => {
-          UpdateUser({ displayName: data?.name, photoURL: mainPhotoUrl })
-            .then(() => {
-              console.log(res.user);
-              axios
-                .post(`http://localhost:5000/user`, formData)
-                .then((res) => {
-                  console.log(res.data);
-                  navigate("/");
-                })
-                .then((error) => {
-                  console.log(error);
-                });
-            })
-            .then((error) => {
-              console.log(error);
-            });
-        })
-        .then((error) => {
-          console.log(error);
-        });
+    } catch (error) {
+      console.error(error);
     }
   };
+
   return (
-    <div className="w-full p-6 lg:p-12 lg:w-96 mx-auto my-11 bg-linear-to-br from-rose-100 via-white to-red-100 ">
-      <div className="flex flex-col gap-4 ">
-        <h1 className="text-xl lg:text-4xl font-extrabold ">
-          {" "}
-          Register Account{" "}
-        </h1>
-
-        <FaRegUserCircle className="size-8" />
-      </div>
-      <form onSubmit={handleSubmit(handleFromData)}>
-        <fieldset className="fieldset">
-          <label className="label text-[#000000] font-semibold ">Name</label>
-          <input
-            type="text"
-            {...register("name", { required: true })}
-            className="input w-full"
-            placeholder="name"
-          />
-          <label className="label text-[#000000] font-semibold ">
-            PhotoURl
-          </label>
-          <input
-            type="file"
-            {...register("photoURL", { required: true })}
-            className="input w-full"
-            placeholder="photoURL"
-          />
-          <label className="label text-[#000000] font-semibold ">Email</label>
-          <input
-            type="email"
-            {...register("email", { required: true })}
-            className="input w-full"
-            placeholder="Email"
-          />
-          <label className="label text-[#000000] font-semibold ">
-            Select a blood group
-          </label>
-
-          <select
-            {...register("bloodGroup", {
-              required: "Blood group is required",
-              onChange: (e) => {
-                console.log("Selected Blood Group:", e.target.value);
-              },
-            })}
-            defaultValue=""
-            className="select w-full"
-          >
-            <option value="" disabled>
-              Select blood group
-            </option>
-
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-          </select>
-
-          <label className="label text-[#000000] font-semibold ">
-            Select a districts
-          </label>
-
-          <select
-            {...register("districts", { required: "districts is required" })}
-            defaultValue=""
-            className="select w-full"
-          >
-            <option value="" disabled>
-              Select district
-            </option>
-
-            {districts.map((u) => (
-              <option key={u.id} value={u.name}>
-                {u.name}
-              </option>
-            ))}
-          </select>
-
-          <label className="label text-[#000000] font-semibold ">
-            Select a upazila
-          </label>
-
-          <select
-            {...register("upazila", { required: "Upazila is required" })}
-            defaultValue=""
-            className="select w-full"
-          >
-            <option value="" disabled>
-              Select upazila
-            </option>
-
-            {upazilas.map((u) => (
-              <option key={u.id} value={u.name}>
-                {u.name}
-              </option>
-            ))}
-          </select>
-
-          <label className="label text-[#000000] font-semibold">Password</label>
-          <input
-            type="password"
-            {...register("Password", {
-              required: "Password is required",
-              pattern: {
-                value: /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/,
-                message:
-                  "Password must have at least 1 uppercase, 1 lowercase and minimum 6 characters",
-              },
-            })}
-            className="input w-full"
-            placeholder="Password"
-          />
-          {errors.Password && (
-            <p style={{ color: "red" }}>{errors.Password.message}</p>
-          )}
-          <div>
-            <a className="link link-hover">Forgot password?</a>
+    <div className="w-full lg:w-6xl p-4 lg:p-0 mx-auto flex bg-red-50 rounded-l-4xl">
+      {/* Left Info Panel */}
+       <div className="w-full lg:w-1/2 flex items-center justify-center ">
+        <div className="w-full max-w-md  py-4">
+          <div className="flex flex-col items-center gap-1 ">
+            <h1 className="text-2xl font-extrabold text-red-600">Register</h1>
+            <p className="text-gray-500 text-center">
+              Create your account and join the blood donation community
+            </p>
           </div>
-          <button className="btn  mt-4 ">Register</button>
-        </fieldset>
-      </form>
-      <p className="text-[#71717A] ">
-        already have an account ? <span className="text-primary">Login</span>
-      </p>
+
+          <form onSubmit={handleSubmit(handleFormData)} className="flex flex-col gap-2">
+            {/* Name */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">Name</label>
+              <input
+                type="text"
+                {...registerForm("name", { required: true })}
+                placeholder="Enter your name"
+                className="input input-bordered w-full focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300"
+              />
+            </div>
+
+            {/* Photo */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">Photo</label>
+              <input
+                type="file"
+                {...registerForm("photoURL", { required: true })}
+                className="input w-full"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">Email</label>
+              <input
+                type="email"
+                {...registerForm("email", { required: true })}
+                placeholder="Enter your email"
+                className="input input-bordered w-full focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">Password</label>
+              <input
+                type="password"
+                {...registerForm("Password", {
+                  required: "Password is required",
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/,
+                    message:
+                      "Password must have at least 1 uppercase, 1 lowercase and minimum 6 characters",
+                  },
+                })}
+                placeholder="Enter your password"
+                className="input input-bordered w-full focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300"
+              />
+              {errors.Password && (
+                <p className="text-red-500 text-sm">{errors.Password.message}</p>
+              )}
+            </div>
+
+            {/* Blood Group */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">Blood Group</label>
+              <select
+                {...registerForm("bloodGroup", { required: true })}
+                className="select w-full"
+              >
+                <option value="" disabled>Select blood group</option>
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
+                  <option key={bg} value={bg}>{bg}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Districts */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">District</label>
+              <select
+                {...registerForm("districts", { required: true })}
+                className="select w-full"
+              >
+                <option value="" disabled>Select district</option>
+                {districts.map(d => (
+                  <option key={d.id} value={d.name}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Upazilas */}
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-700 font-semibold">Upazila</label>
+              <select
+                {...registerForm("upazila", { required: true })}
+                className="select w-full"
+              >
+                <option value="" disabled>Select upazila</option>
+                {upazilas.map(u => (
+                  <option key={u.id} value={u.name}>{u.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <button type="submit" className="btn bg-red-800 hover:bg-red-600 text-white font-bold mt-4 shadow-lg transform hover:scale-105 transition-all duration-300">
+              Register
+            </button>
+          </form>
+
+          <p className="text-center text-gray-500 mt-6">
+            Already have an account?{" "}
+            <NavLink to="/auth/login" className="text-red-500 font-bold hover:underline">
+              Sign In
+            </NavLink>
+          </p>
+        </div>
+      </div>
+
+        {/* Right Form Panel */}
+     <motion.div
+  initial={{ x: 120, opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  transition={{ duration: 1.5, ease: "easeOut" }}
+  className="hidden lg:flex w-1/2 flex-col justify-center bg-red-900 text-white p-12 rounded-l-3xl relative overflow-hidden"
+> 
+        <div className="absolute top-[-50px] left-[-50px] w-60 h-60 opacity-20 animate-stethoscope-spin">
+          <FaStethoscope className="w-full h-full text-white" />
+        </div>
+        <div className="absolute bottom-[-40px] right-[-40px] w-72 h-72 opacity-15 animate-stethoscope-bounce">
+          <FaStethoscope className="w-full h-full text-red-300" />
+        </div>
+
+        <div className="mb-8 relative z-10">
+          <FaStethoscope className="w-16 h-16 mb-4 text-white animate-bounce-slow" />
+          <h1 className="text-3xl font-extrabold mb-2">Join Blood Donor</h1>
+          <p className="text-red-100">
+            Create your account and start saving lives with blood donation.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-4 mt-6 relative z-10">
+          <div className="flex items-center gap-3 bg-red-500/30 p-3 rounded-lg hover:scale-105 transition-transform duration-300">
+            <span>🩸</span>
+            <p>Donate blood easily</p>
+          </div>
+          <div className="flex items-center gap-3 bg-red-500/30 p-3 rounded-lg hover:scale-105 transition-transform duration-300">
+            <span>🚑</span>
+            <p>Receive blood in emergencies</p>
+          </div>
+          <div className="flex items-center gap-3 bg-red-500/30 p-3 rounded-lg hover:scale-105 transition-transform duration-300">
+            <span>🌍</span>
+            <p>Connect with donors worldwide</p>
+          </div>
+        </div>
+    </motion.div>
+
+ 
+     
+
+      {/* Animations */}
+      <style>{`
+        @keyframes stethoscope-spin {
+          0% { transform: rotate(0deg) translateX(0) translateY(0); }
+          50% { transform: rotate(45deg) translateX(10px) translateY(10px); }
+          100% { transform: rotate(0deg) translateX(0) translateY(0); }
+        }
+        @keyframes stethoscope-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-stethoscope-spin {
+          animation: stethoscope-spin 6s linear infinite;
+        }
+        .animate-stethoscope-bounce {
+          animation: stethoscope-bounce 4s ease-in-out infinite;
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };

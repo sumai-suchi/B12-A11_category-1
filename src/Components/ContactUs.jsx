@@ -5,7 +5,7 @@ const ContactUs = () => {
     <section className="py-20 bg-gradient-to-b from-red-50 to-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-red-600">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-red-800">
             Contact Us
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-gray-600 text-lg">
