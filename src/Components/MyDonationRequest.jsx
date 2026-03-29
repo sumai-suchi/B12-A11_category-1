@@ -1,132 +1,211 @@
 import { useContext, useEffect, useState } from "react";
-import useAxiosSecure from "../hooks/useAxiosSecure";
 import { AuthContext } from "../AuthContext/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 import { NavLink } from "react-router";
 import { MdEdit } from "react-icons/md";
+import { motion } from "framer-motion";
 
+/* ================= Main Component ================= */
 const MyDonationRequest = () => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
-  const [MyRequest, setMyRequest] = useState([]);
-  const [AllRequest, setAllRequest] = useState([]);
+
+  const [myRequests, setMyRequests] = useState([]);
+  const [allRequests, setAllRequests] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
-  console.log(user);
+
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axiosSecure.get(`/my-donation-request`);
-      setAllRequest(res.data);
-      setMyRequest(res.data);
+      try {
+        const res = await axiosSecure.get(`/my-donation-request`);
+        setAllRequests(res.data);
+        setMyRequests(res.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
     fetchData();
   }, [axiosSecure, user?.email]);
 
-  console.log(MyRequest);
-
   const handleStatus = async (donationStatus, _id) => {
-    console.log(donationStatus);
-    console.log(_id);
-
     try {
-      const res = await axiosSecure.patch(
+      await axiosSecure.patch(
         `/update/userRequest/status?id=${_id}&donationStatus=${donationStatus}`
       );
-      setMyRequest((prevUsers) =>
-        prevUsers.map((user) =>
-          user._id === _id ? { ...user, donationStatus } : user
-        )
+      setMyRequests((prev) =>
+        prev.map((r) => (r._id === _id ? { ...r, donationStatus } : r))
       );
-      console.log(res.data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const handleFilter = (status) => {
     setStatusFilter(status);
-
-    if (status === "all") {
-      setMyRequest(AllRequest);
-    } else {
-      const filterReq = AllRequest.filter(
-        (userRequest) => userRequest.donationStatus === status
-      );
-
-      setMyRequest(filterReq);
-    }
+    if (status === "all") setMyRequests(allRequests);
+    else setMyRequests(allRequests.filter((r) => r.donationStatus === status));
   };
 
   const handleDeleteOne = async (id) => {
     try {
-      const res = await axiosSecure.delete(`/userRequest/${id}`);
-      setMyRequest((prevUsers) => prevUsers.filter((user) => user._id !== id));
-
-      console.log(res.data);
+      await axiosSecure.delete(`/userRequest/${id}`);
+      setMyRequests((prev) => prev.filter((r) => r._id !== id));
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
-  console.log(MyRequest);
 
   return (
-    <div className="p-4 bg-base-100 rounded-lg shadow-md ">
-      <h2 className="text-xl font-bold text-red-600 mb-4">
-        🩸 My Donation Requests
-      </h2>
+    <div className="relative min-h-screen px-4 py-10">
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {["all", "pending", "inprogress", "done", "canceled"].map((status) => (
-          <button
-            key={status}
-            onClick={() => handleFilter(status)}
-            className={`btn btn-sm ${
-              statusFilter === status ? "btn-primary" : "btn-outline"
-            } capitalize`}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
+      {/* ✅ Background */}
+      <img
+        src="/BloodDonationImg.png"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-red-700/70 via-black/30 to-black/50"></div>
 
-      <div className="h-full py-8 h-screen bg-linear-to-r from-red-700/80 to-black/30 px-3">
-        <div className="p-4 bg-base-100 rounded-lg shadow-md ">
-          <div className="lg:hidden space-y-4">
-            {MyRequest.length > 0 ? (
-              MyRequest.map((req) => (
-                <div
-                  key={req._id}
-                  className="card bg-base-100 shadow-md border border-red-100"
-                >
-                  <div className="card-body p-4 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h2 className="font-bold text-lg text-red-600">
-                        {req.recipientName}
-                      </h2>
-                      <span className="badge badge-error">
-                        {req.bloodGroup}
-                      </span>
+      {/* 💎 Glass Container */}
+      <motion.div
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative max-w-7xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 p-6 md:p-10 rounded-3xl shadow-2xl"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-6">
+          🩸 My Donation Requests
+        </h2>
+
+        {/* 🔹 Filter Buttons */}
+        <div className="mb-6 flex flex-wrap gap-2 justify-center">
+          {["all", "pending", "inprogress", "done", "canceled"].map((status) => (
+            <button
+              key={status}
+              onClick={() => handleFilter(status)}
+              className={`btn btn-sm ${
+                statusFilter === status ? "btn-primary" : "btn-outline text-white"
+              } capitalize`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+
+        {/* 🔹 Mobile Cards */}
+        <div className="lg:hidden space-y-4">
+          {myRequests.length > 0 ? (
+            myRequests.map((req) => (
+              <div
+                key={req._id}
+                className="card bg-white/10 border border-red-100 shadow-md"
+              >
+                <div className="card-body p-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <h2 className="font-bold text-lg text-red-600">{req.recipientName}</h2>
+                    <span className="badge badge-error">{req.bloodGroup}</span>
+                  </div>
+                  <p className="text-sm">
+                    <span className="font-semibold">Hospital:</span> {req.hospitalName}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-semibold">Address:</span> {req.address}, {req.upazila}, {req.district}
+                  </p>
+                  <p className="text-sm"><span className="font-semibold">Date:</span> {req.donationDate}</p>
+                  <p className="text-sm"><span className="font-semibold">Time:</span> {req.donationTime}</p>
+
+                  <span
+                    className={`badge ${
+                      req.donationStatus === "pending"
+                        ? "badge-warning"
+                        : req.donationStatus === "inprogress"
+                        ? "badge-info"
+                        : req.donationStatus === "done"
+                        ? "badge-success"
+                        : "badge-error"
+                    } capitalize`}
+                  >
+                    {req.donationStatus}
+                  </span>
+
+                  {req.donationStatus === "inprogress" && (
+                    <div className="bg-gray-100 p-2 rounded-md text-sm">
+                      <p className="font-semibold">{req.requesterName}</p>
+                      <p>{req.requesterEmail}</p>
                     </div>
+                  )}
 
-                    <p className="text-sm">
-                      <span className="font-semibold">Hospital:</span>{" "}
-                      {req.hospitalName}
-                    </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {req.donationStatus === "inprogress" && (
+                      <>
+                        <button
+                          onClick={() => handleStatus("done", req._id)}
+                          className="btn btn-success btn-sm"
+                        >
+                          Done
+                        </button>
+                        <button
+                          onClick={() => handleStatus("canceled", req._id)}
+                          className="btn btn-error btn-sm"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                    <NavLink
+                      to={`/dashboard/donation-request-details-page/${req._id}`}
+                      className="btn btn-sm bg-black text-white"
+                    >
+                      <MdEdit />
+                    </NavLink>
+                    <NavLink
+                      to={`/dashboard/donation-details-page/${req._id}`}
+                      className="btn btn-sm bg-green-800 text-white"
+                    >
+                      Details
+                    </NavLink>
+                    <button
+                      onClick={() => handleDeleteOne(req._id)}
+                      className="btn btn-error btn-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-300">No donation requests found.</p>
+          )}
+        </div>
 
-                    <p className="text-sm">
-                      <span className="font-semibold">Address:</span>{" "}
-                      {req.address}, {req.upazila}, {req.district}
-                    </p>
-
-                    <p className="text-sm">
-                      <span className="font-semibold">Date:</span>{" "}
-                      {req.donationDate}
-                    </p>
-
-                    <p className="text-sm">
-                      <span className="font-semibold">Time:</span>{" "}
-                      {req.donationTime}
-                    </p>
-
-                    <div>
+        {/* 🔹 Desktop Table */}
+        <div className="hidden lg:block overflow-x-auto mt-6">
+          <table className="table table-zebra w-full text-white">
+            <thead>
+              <tr>
+                <th>Recipient</th>
+                <th>Blood Group</th>
+                <th>Hospital</th>
+                <th>Address</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Donor Info</th>
+                <th>Change Status</th>
+                <th>Edit Request</th>
+                <th>Delete</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myRequests.length > 0 ? (
+                myRequests.map((req) => (
+                  <tr key={req._id}>
+                    <td>{req.recipientName}</td>
+                    <td><span className="badge badge-error">{req.bloodGroup}</span></td>
+                    <td>{req.hospitalName}</td>
+                    <td>{`${req.address || ""}, ${req.upazila}, ${req.district}`}</td>
+                    <td>{`${req.donationDate} at ${req.donationTime}`}</td>
+                    <td>
                       <span
                         className={`badge ${
                           req.donationStatus === "pending"
@@ -140,193 +219,68 @@ const MyDonationRequest = () => {
                       >
                         {req.donationStatus}
                       </span>
-                    </div>
-
-                    {req.donationStatus === "inprogress" && (
-                      <div className="bg-gray-100 p-2 rounded-md text-sm">
-                        <p className="font-semibold">{req.requesterName}</p>
-                        <p>{req.requesterEmail}</p>
-                      </div>
-                    )}
-
-                    <div className="flex flex-wrap gap-2 mt-3">
+                    </td>
+                    <td>
                       {req.donationStatus === "inprogress" && (
-                        <>
+                        <div>
+                          <p className="font-semibold">{req.requesterName}</p>
+                          <p>{req.requesterEmail}</p>
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      {req.donationStatus === "inprogress" && (
+                        <div className="flex gap-1">
                           <button
                             onClick={() => handleStatus("done", req._id)}
-                            className="btn btn-success btn-sm"
+                            className="btn p-1 btn-success"
                           >
                             Done
                           </button>
-
                           <button
-                            onClick={() => handleStatus("cancel", req._id)}
-                            className="btn btn-error btn-sm"
+                            onClick={() => handleStatus("canceled", req._id)}
+                            className="btn p-1 btn-error"
                           >
                             Cancel
                           </button>
-                        </>
+                        </div>
                       )}
-
-                      <NavLink
-                        to={`/dashboard/donation-request-details-page/${req._id}`}
-                        className="btn btn-sm bg-black text-white"
-                      >
-                        <MdEdit />
+                    </td>
+                    <td>
+                      <NavLink to={`/dashboard/donation-request-details-page/${req._id}`}>
+                        <button className="p-1 bg-black text-white rounded-2xl">
+                          <MdEdit />
+                        </button>
                       </NavLink>
-
-                      <NavLink
-                        to={`donation-details-page/${req._id}`}
-                        className="btn btn-sm bg-green-800 text-white"
-                      >
-                        Details
-                      </NavLink>
-
+                    </td>
+                    <td>
                       <button
                         onClick={() => handleDeleteOne(req._id)}
-                        className="btn btn-error btn-sm"
+                        className="btn p-1 btn-error"
                       >
                         Delete
                       </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-gray-500">
-                No donation requests found.
-              </p>
-            )}
-          </div>
-
-          <div className="hidden lg:block h-full overflow-x-auto">
-            <table className="table table-zebra w-full">
-              <thead>
-                <tr>
-                  <th>Recipient</th>
-                  <th>Blood Group</th>
-                  <th>Hospital</th>
-                  <th>Address</th>
-                  <th>Date & Time</th>
-                  <th>Status</th>
-                  <th>DonnerInfo</th>
-                  <th>change Status</th>
-                  <th>Edit request</th>
-                  <th> Delete</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MyRequest.length > 0 ? (
-                  MyRequest.map((req) => (
-                    <tr key={req._id}>
-                      <td>
-                        <div className="flex flex-col">
-                          <span className="font-medium">
-                            {req.recipientName}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="badge badge-error">
-                          {req.bloodGroup}
-                        </span>
-                      </td>
-                      <td>{req.hospitalName}</td>
-                      <td>{`${req.address || ""}, ${req.upazila}, ${
-                        req.district
-                      }`}</td>
-                      <td>{`${req.donationDate} at ${req.donationTime}`}</td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            req.donationStatus === "pending"
-                              ? "badge-warning"
-                              : req.donationStatus === "inprogress"
-                              ? "badge-info"
-                              : req.donationStatus === "done"
-                              ? "badge-success"
-                              : "badge-error"
-                          } capitalize`}
-                        >
-                          {req.donationStatus}
-                        </span>
-                      </td>
-                      <td>
-                        {req.donationStatus === "inprogress" && (
-                          <div>
-                            <span className=" text-black font-semibold">
-                              {req.requesterName}
-                              <p>{req.requesterEmail}</p>
-                            </span>
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        {req.donationStatus === "inprogress" && (
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => handleStatus(`done`, `${req._id}`)}
-                              className="btn p-1 btn-soft btn-success"
-                            >
-                              done
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleStatus(`cancel`, `${req._id}`)
-                              }
-                              className="btn p-1 btn-soft btn-error"
-                            >
-                              cancel
-                            </button>
-                          </div>
-                        )}
-                      </td>
-
-                      <td>
-                        <NavLink
-                          to={`/dashboard/donation-request-details-page/${req._id}`}
-                        >
-                          <button className=" p-1 bg-black text-white rounded-2xl">
-                            <MdEdit />
-                          </button>
-                        </NavLink>
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => handleDeleteOne(req._id)}
-                          type="button"
-                          className="btn p-1 btn-error"
-                        >
-                          Delete
+                    </td>
+                    <td>
+                      <NavLink to={`/dashboard/donation-details-page/${req._id}`}>
+                        <button className="btn p-1 bg-green-900 text-white">
+                          Details
                         </button>
-                      </td>
-                      <td>
-                        <NavLink
-                          to={`/dashboard/donation-details-page/${req._id}`}
-                        >
-                          <button
-                            type="button"
-                            className="btn p-1 bg-green-900 text-white"
-                          >
-                            details
-                          </button>
-                        </NavLink>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="text-center text-gray-500">
-                      No donation requests found.
+                      </NavLink>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="11" className="text-center text-gray-300">
+                    No donation requests found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
