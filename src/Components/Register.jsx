@@ -12,45 +12,84 @@ const Register = () => {
 
   const [upazilas, setUpazilas] = useState([]);
   const [districts, setDistricts] = useState([]);
-
+  const [selectedDistrictId, setSelectedDistrictId] = useState("");
+const [selectedDistrictName, setSelectedDistrictName] = useState("");
   useEffect(() => {
     axios.get("/upazila.json").then((res) => setUpazilas(res.data.upazilas));
     axios.get("/districts.json").then((res) => setDistricts(res.data.districts));
   }, []);
 
-  const handleFormData = async (data) => {
-    try {
-      const file = data.photoURL[0];
-      const res = await axios.post(
-        `https://api.imgbb.com/1/upload?key=5badb61c303d075b3a4757bc1229a32b`,
-        { image: file },
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+const handleFormData = async (data) => {
+  try {
+    const file = data.photoURL[0];
 
-      if (res.data.success) {
-        const mainPhotoUrl = res.data.data.display_url;
-
-        const formData = {
-          name: data.name,
-          email: data.email,
-          mainPhotoUrl,
-          bloodGroup: data.bloodGroup,
-          upazila: data.upazila,
-          districts: data.districts,
-        };
-        console.log(formData)
-
-        await SignUpWithEmailPassword(data.email, data.Password);
-        await UpdateUser({ displayName: data.name, photoURL: mainPhotoUrl });
-
-        await axios.post("http://localhost:5000/user", formData);
-        navigate("/");
+    const res = await axios.post(
+      `https://api.imgbb.com/1/upload?key=5badb61c303d075b3a4757bc1229a32b`,
+      { image: file },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    );
 
+    if (res.data.success) {
+      const mainPhotoUrl = res.data.data.display_url;
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          const formData = {
+            name: data.name,
+            email: data.email,
+            mainPhotoUrl,
+            bloodGroup: data.bloodGroup,
+            upazila: data.upazila,
+           districts: selectedDistrictName,
+
+            location: {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            },
+          };
+
+          console.log(formData);
+        
+
+          await SignUpWithEmailPassword(
+            data.email,
+            data.Password
+          );
+
+          await UpdateUser({
+            displayName: data.name,
+            photoURL: mainPhotoUrl,
+          });
+
+          await axios.post(
+            "http://localhost:5000/user",
+            formData
+          );
+
+          // navigate("/");
+        },
+
+        (error) => {
+          console.log(error);
+          alert("Location permission is required");
+        }
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const filteredUpazilas = upazilas.filter(
+  (u) => u.district_id === selectedDistrictId
+);
   return (
     <div className="w-full lg:w-6xl p-4 lg:p-0 mx-auto flex bg-red-50 rounded-l-4xl">
       {/* Left Info Panel */}
@@ -132,32 +171,58 @@ const Register = () => {
             </div>
 
             {/* Districts */}
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-700 font-semibold">District</label>
-              <select
-                {...registerForm("districts", { required: true })}
-                className="select w-full"
-              >
-                <option value="" disabled>Select district</option>
-                {districts.map(d => (
-                  <option key={d.id} value={d.name}>{d.name}</option>
-                ))}
-              </select>
-            </div>
+   {/* Districts */}
+<div className="flex flex-col gap-2">
+  <label className="text-gray-700 font-semibold">
+    District
+  </label>
 
-            {/* Upazilas */}
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-700 font-semibold">Upazila</label>
-              <select
-                {...registerForm("upazila", { required: true })}
-                className="select w-full"
-              >
-                <option value="" disabled>Select upazila</option>
-                {upazilas.map(u => (
-                  <option key={u.id} value={u.name}>{u.name}</option>
-                ))}
-              </select>
-            </div>
+  <select
+    {...registerForm("districts", { required: true })}
+    className="select w-full"
+    defaultValue=""
+    onChange={(e) => {
+      const district = districts.find(
+        (d) => d.id === e.target.value
+      );
+
+      setSelectedDistrictId(district.id);
+      setSelectedDistrictName(district.name);
+    }}
+  >
+    <option value="" disabled>
+      Select district
+    </option>
+
+    {districts.map((d) => (
+      <option key={d.id} value={d.id}>
+        {d.name}
+      </option>
+    ))}
+  </select>
+</div>
+
+           {/* Upazilas */}
+<div className="flex flex-col gap-2">
+  <label className="text-gray-700 font-semibold">
+    Upazila
+  </label>
+
+  <select
+    {...registerForm("upazila", { required: true })}
+    className="select w-full"
+  >
+    <option value="" disabled selected>
+      Select upazila
+    </option>
+
+    {filteredUpazilas.map((u) => (
+      <option key={u.id} value={u.name}>
+        {u.name}
+      </option>
+    ))}
+  </select>
+</div>
 
             <button type="submit" className="btn bg-red-800 hover:bg-red-600 text-white font-bold mt-4 shadow-lg transform hover:scale-105 transition-all duration-300">
               Register

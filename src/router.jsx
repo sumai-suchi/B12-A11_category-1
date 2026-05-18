@@ -20,6 +20,7 @@ import DonationRequestBlood from "./Components/DonationRequestBlood";
 import ErrorPage from "./Components/ErrorPage";
 import Donate from "./Components/Donate";
 import SuccessPage from "./Components/SuccessPage";
+import AboutPage from "./pages/AboutPage";
 
 const router = createBrowserRouter([
   {
@@ -46,7 +47,12 @@ const router = createBrowserRouter([
       {
         path: "/payment-success",
         element: <SuccessPage></SuccessPage>,
+
       },
+     {
+      path: "about-page",
+      element: <AboutPage></AboutPage>
+     }
     ],
   },
 
