@@ -8,7 +8,7 @@ import {
   FaSignOutAlt,
   FaBars,
 } from "react-icons/fa";
-import SidebarLink from "../Components/SidebarLink";
+import SidebarLink from "../Components/ui/SidebarLink"
 import { useContext } from "react";
 import { AuthContext } from "../AuthContext/AuthContext";
 

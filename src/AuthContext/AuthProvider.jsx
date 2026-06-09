@@ -12,7 +12,7 @@ import { AuthContext } from "./AuthContext";
 import axios from "axios";
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [roleLoading, setRoleLoading] = useState(true);
   const [role, setRole] = useState("");
@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
       .then((error) => {
         console.log(error);
       });
-  }, [user, role]);
+  }, [user]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (CurrentUser) => {
@@ -59,7 +59,7 @@ const AuthProvider = ({ children }) => {
     return () => {
       unsubscribe();
     };
-  }, [role]);
+  }, []);
 
   const SignOut = () => {
     return signOut(auth);

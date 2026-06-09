@@ -2,8 +2,8 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { MapPin, Droplet, Send } from 'lucide-react'; // Optional: for nice icons
-import ChatModal from './ChatModal';
-import { AuthContext } from '../AuthContext/AuthContext';
+import ChatModal from "../modals/ChatModal";
+import { AuthContext } from '../../AuthContext/AuthContext';
 import axios from 'axios';
 
 const NearByRearchResult = ({ donors }) => {

@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router";
-import Navbar from "../Components/Navbar";
-import Footer from "../Components/Footer";
+import Navbar from "../Components/layout/Navbar";
+import Footer from "../Components/layout/Footer";
 
 const AuthLayout = () => {
 const location = useLocation();

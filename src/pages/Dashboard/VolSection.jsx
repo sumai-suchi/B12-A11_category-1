@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import useAxiosSecure from "../hooks/useAxiosSecure";
-import { AuthContext } from "../AuthContext/AuthContext";
+import useAxiosSecure from "../../hooks/useAxiosSecure"
+import { AuthContext } from "../../AuthContext/AuthContext"
 import { NavLink } from "react-router";
 import { MdEdit } from "react-icons/md";
 

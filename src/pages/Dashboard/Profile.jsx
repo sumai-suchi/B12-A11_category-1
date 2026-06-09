@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../AuthContext/AuthContext";
-import useAxiosSecure from "../hooks/useAxiosSecure";
+import { AuthContext } from "../../AuthContext/AuthContext"
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { motion } from "framer-motion";
 import { Listbox } from "@headlessui/react";
 
@@ -70,7 +70,7 @@ const Profile = () => {
           bloodGroup: res.data.bloodGroup || "",
           districts: res.data.districts || "",
           upazila: res.data.upazila || "",
-          role: res.data.role || "",
+          role: res.data.role,
           status: res.data.status || "",
           createdAt: res.data.createdAt || "",
         });
@@ -156,12 +156,13 @@ const Profile = () => {
             <FloatingInput label="Upazila" name="upazila" value={formData.upazila} onChange={handleChange} />
             <FloatingInput label="Photo URL" name="mainPhotoUrl" value={formData.mainPhotoUrl} onChange={handleChange} />
 
-            <FloatingSelect
+            {/* <FloatingSelect
               label="Role"
               value={formData.role}
               setValue={(val) => setFormData({ ...formData, role: val })}
               options={["user", "moderator", "admin"]}
-            />
+            /> */}
+              <FloatingInput label="Role" name="role" value={formData.role} readOnly />
 
             <FloatingSelect
               label="Status"

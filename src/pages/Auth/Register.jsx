@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AuthContext } from "../AuthContext/AuthContext";
+import { AuthContext } from "../../AuthContext/AuthContext";
 import axios from "axios";
 import { FaStethoscope } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -24,7 +24,7 @@ const handleFormData = async (data) => {
     const file = data.photoURL[0];
 
     const res = await axios.post(
-      `https://api.imgbb.com/1/upload?key=5badb61c303d075b3a4757bc1229a32b`,
+      `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
       { image: file },
       {
         headers: {
@@ -73,7 +73,7 @@ const handleFormData = async (data) => {
             formData
           );
 
-          // navigate("/");
+          navigate("/");
         },
 
         (error) => {

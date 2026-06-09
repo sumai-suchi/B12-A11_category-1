@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
-import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useEffect, useState } from "react";
-import DonnerInfoModal from "./DonnerInfoModal";
+import DonnerInfoModal from "../../Components/modals/DonnerInfoModal";
 
 const DetailsPage = () => {
   const { id } = useParams();

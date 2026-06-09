@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import useAxiosSecure from "../hooks/useAxiosSecure";
-import { AuthContext } from "../AuthContext/AuthContext";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { AuthContext } from "../../AuthContext/AuthContext";
+
 
 const AllUser = () => {
   const { user: newUser } = useContext(AuthContext);

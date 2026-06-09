@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AuthContext } from "../AuthContext/AuthContext";
+import { AuthContext } from "../../AuthContext/AuthContext";
 import { FaStethoscope } from "react-icons/fa";
 import { motion } from "framer-motion";
 

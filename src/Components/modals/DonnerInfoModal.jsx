@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { AuthContext } from "../AuthContext/AuthContext";
-import useAxiosSecure from "../hooks/useAxiosSecure";
+import { AuthContext } from "../../AuthContext/AuthContext";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const DonnerInfoModal = ({ SingleData }) => {
   const { user } = useContext(AuthContext);

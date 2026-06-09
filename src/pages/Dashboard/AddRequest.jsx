@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../AuthContext/AuthContext";
+import { AuthContext } from "../../AuthContext/AuthContext";
 import Swal from "sweetalert2";
-import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Listbox } from "@headlessui/react";

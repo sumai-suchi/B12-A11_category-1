@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { motion } from 'framer-motion';
 import { Search, Droplet, MapPin, Heart, Users, Activity } from 'lucide-react';
-import DonorResults from "./DonorResults";
-import NearByRearchResult from "./NearByRearchResult";
+import DonorResults from  "../../Components/shared/DonorResults"
+import NearByRearchResult from "../../Components/shared/NearByRearchResult"
 
 const SearchDonner = () => {
   const [bloodGroup, setBloodGroup] = useState("");
@@ -41,7 +41,7 @@ const findNearbyDonors = () => {
       const lng = position.coords.longitude;
       console.log("User location:", { lat, lng });
 
-      const bloodGroup = "O+";
+  
 
       const res = await fetch(
         `http://localhost:5000/nearby-donors?lat=${lat}&lng=${lng}&bloodGroup=${encodeURIComponent(bloodGroup)}`

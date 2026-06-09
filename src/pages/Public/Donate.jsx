@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { AuthContext } from "../AuthContext/AuthContext";
-import useAxios from "../hooks/useAxios";
+import { AuthContext } from "../../AuthContext/AuthContext";
+import useAxios from "../../hooks/useAxios";
 
 const Donate = () => {
   const { user } = useContext(AuthContext);
