@@ -69,7 +69,8 @@ const handleFormData = async (data) => {
           });
 
           await axios.post(
-            "http://localhost:5000/user",
+            "https://blooddonationserver.vercel.app/user",
+            
             formData
           );
 

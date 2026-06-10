@@ -13,7 +13,8 @@ import { useContext } from "react";
 import { AuthContext } from "../AuthContext/AuthContext";
 
 const Dashboard = () => {
-  const { SignOut, role } = useContext(AuthContext);
+  const { SignOut, role ,user} = useContext(AuthContext);
+  console.log("role",role,"user", user)
 
   const handleLogOut = () => {
     SignOut();

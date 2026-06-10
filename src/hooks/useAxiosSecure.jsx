@@ -3,12 +3,12 @@ import { useContext, useEffect } from "react";
 import { AuthContext } from "../AuthContext/AuthContext";
 
 const axiosSecure = axios.create({
-  baseURL: "https://b12-a11-category-1-server.vercel.app/",
+  baseURL: "https://blooddonationserver.vercel.app",
 });
 
 const useAxiosSecure = () => {
   const { user } = useContext(AuthContext);
-  console.log(user?.accessToken);
+  // console.log(user?.accessToken);
   useEffect(() => {
     const reqInterceptor = axiosSecure.interceptors.request.use((config) => {
       config.headers.Authorization = `Bearer ${user?.accessToken}`;

@@ -17,7 +17,7 @@ const Login = () => {
       password: "As123456",
     },
     donor: {
-      email: "sojoni@demo.com",
+      email: "kasi@gmail.com.com",
       password: "As123456",
     },
     volunteer: {
