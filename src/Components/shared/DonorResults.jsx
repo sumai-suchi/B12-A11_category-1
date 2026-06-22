@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, MapPin, CheckCircle, Droplets, Search, Navigation } from 'lucide-react';
+import HeroContactModal from '../modals/HeroContactModal';
 
 const DonorResults = ({ donors = [], loading }) => {
+  const [selectedDonor, setSelectedDonor] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openContactModal = (donor) => {
+    setSelectedDonor(donor);
+    setIsModalOpen(true);
+  };
+
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -117,6 +126,7 @@ const DonorResults = ({ donors = [], loading }) => {
               {/* Call Button */}
               <motion.button 
                 whileTap={{ scale: 0.95 }}
+                onClick={() => openContactModal(donor)}
                 className="w-full bg-slate-900 group-hover:bg-rose-600 text-white py-5 rounded-[1.8rem] font-black flex items-center justify-center gap-3 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.1)] group-hover:shadow-rose-200 transition-all duration-300"
               >
                 <Phone size={20} className="fill-current" />
@@ -126,6 +136,12 @@ const DonorResults = ({ donors = [], loading }) => {
           </div>
         </motion.div>
       ))}
+      {isModalOpen && selectedDonor && (
+        <HeroContactModal
+          donor={selectedDonor}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      )}
     </motion.div>
   );
 };

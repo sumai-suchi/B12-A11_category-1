@@ -20,6 +20,21 @@ const DonnerInfoModal = ({ SingleData }) => {
       console.log(error);
     }
   };
+
+  const handleDonationHistory = async (SingleData) => {
+    const email = user?.email;
+    const donationData={
+      email,
+      ...SingleData
+    }
+    try {
+      const res = await axiosSecure.post(`/donation-history`,donationData);
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       <label htmlFor="donor-modal" className="btn btn-error">
@@ -68,7 +83,10 @@ const DonnerInfoModal = ({ SingleData }) => {
             <label
               className="btn  btn-error text-white "
               htmlFor="donor-modal"
-              onClick={() => handleStatus(SingleData?._id, "inprogress")}
+              onClick={() => {
+                handleStatus(SingleData?._id, "inprogress");
+                handleDonationHistory(SingleData);
+              }}
             >
               Confirm & Continue
             </label>

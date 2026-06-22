@@ -1,284 +1,158 @@
 import { useContext, useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { AuthContext } from "../../AuthContext/AuthContext";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { NavLink } from "react-router";
-import { MdEdit } from "react-icons/md";
-import { motion } from "framer-motion";
+import RequestDesktopTable from "./components/RequestDesktopTable";
+import RequestHeader from "./components/RequestHeader";
+import RequestMobileList from "./components/RequestMobileList";
+import RequestPagination from "./components/RequestPagination";
+import RequestToolbar from "./components/RequestToolbar";
+import { DEFAULT_PAGE_SIZE } from "./components/constants";
 
-/* ================= Main Component ================= */
 const MyDonationRequest = () => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
 
-  const [myRequests, setMyRequests] = useState([]);
   const [allRequests, setAllRequests] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("");
+  const [counts, setCounts] = useState({ all: 0, pending: 0, inprogress: 0, done: 0, canceled: 0 });
+  const [totalCount, setTotalCount] = useState(0);
 
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+
+  // ─── fetch counts ────────────────────────────────────────────────────────
   useEffect(() => {
-    const fetchData = async () => {
+    if (!user?.email) return;
+    const fetchCounts = async () => {
       try {
-        const res = await axiosSecure.get(`/my-donation-request`);
-        setAllRequests(res.data);
-        setMyRequests(res.data);
+        const res = await axiosSecure.get(`/my-donation-request/counts`);
+        setCounts(res.data);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchData();
+    fetchCounts();
   }, [axiosSecure, user?.email]);
 
+  // ─── fetch paginated/filtered requests ───────────────────────────────────
+  useEffect(() => {
+    if (!user?.email) return;
+    const fetchRequests = async () => {
+      try {
+        const res = await axiosSecure.get(
+          `/my-donation-request?status=${statusFilter}&search=${searchText}&page=${currentPage}&limit=${pageSize}`
+        );
+        setAllRequests(res.data.data || []);
+        setTotalCount(res.data.totalCount || 0);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchRequests();
+  }, [axiosSecure, user?.email, statusFilter, searchText, currentPage, pageSize]);
+
+  // ─── reset page on filter / search / page-size change ───────────────────
+  const handleFilter = (value) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
+
+  const handleSearch = (value) => {
+    setSearchText(value);
+    setCurrentPage(1);
+  };
+
+  const handlePageSize = (size) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  // ─── actions ─────────────────────────────────────────────────────────────
   const handleStatus = async (donationStatus, _id) => {
     try {
       await axiosSecure.patch(
         `/update/userRequest/status?id=${_id}&donationStatus=${donationStatus}`
       );
-      setMyRequests((prev) =>
-        prev.map((r) => (r._id === _id ? { ...r, donationStatus } : r))
+
+      // Optimistically update the list
+      setAllRequests((prev) =>
+        prev.map((request) =>
+          request._id === _id ? { ...request, donationStatus } : request
+        )
       );
+      
+      // Re-fetch counts
+      const countsRes = await axiosSecure.get(`/my-donation-request/counts`);
+      setCounts(countsRes.data);
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleFilter = (status) => {
-    setStatusFilter(status);
-    if (status === "all") setMyRequests(allRequests);
-    else setMyRequests(allRequests.filter((r) => r.donationStatus === status));
   };
 
   const handleDeleteOne = async (id) => {
     try {
       await axiosSecure.delete(`/userRequest/${id}`);
-      setMyRequests((prev) => prev.filter((r) => r._id !== id));
+      
+      // Optimistically update the list
+      setAllRequests((prev) => prev.filter((request) => request._id !== id));
+      
+      // Update totals optimistically
+      setTotalCount((prev) => Math.max(0, prev - 1));
+      
+      // Re-fetch counts
+      const countsRes = await axiosSecure.get(`/my-donation-request/counts`);
+      setCounts(countsRes.data);
     } catch (error) {
       console.error(error);
     }
   };
 
+  // ─── render ──────────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen px-4 py-10">
-
-      {/* ✅ Background */}
-      <img
-        src="/BloodDonationImg.png"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-red-700/70 via-black/30 to-black/50"></div>
-
-      {/* 💎 Glass Container */}
+    <div className="min-h-screen bg-[#f6f7f9] px-4 py-6 text-slate-900 sm:px-6 lg:px-8">
       <motion.div
-        initial={{ opacity: 0, y: 60 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative max-w-7xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 p-6 md:p-10 rounded-3xl shadow-2xl"
+        className="mx-auto max-w-7xl"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-6">
-          🩸 My Donation Requests
-        </h2>
+        <RequestHeader
+          counts={counts}
+          statusFilter={statusFilter}
+          onFilter={handleFilter}
+        />
 
-        {/* 🔹 Filter Buttons */}
-        <div className="mb-6 flex flex-wrap gap-2 justify-center">
-          {["all", "pending", "inprogress", "done", "canceled"].map((status) => (
-            <button
-              key={status}
-              onClick={() => handleFilter(status)}
-              className={`btn btn-sm ${
-                statusFilter === status ? "btn-primary" : "btn-outline text-white"
-              } capitalize`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <RequestToolbar
+            totalRequests={counts.all}
+            visibleCount={allRequests.length}
+            searchText={searchText}
+            statusFilter={statusFilter}
+            onSearchChange={handleSearch}
+            onFilter={handleFilter}
+          />
 
-        {/* 🔹 Mobile Cards */}
-        <div className="lg:hidden space-y-4">
-          {myRequests.length > 0 ? (
-            myRequests.map((req) => (
-              <div
-                key={req._id}
-                className="card bg-white/10 border border-red-100 shadow-md"
-              >
-                <div className="card-body p-4 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h2 className="font-bold text-lg text-red-600">{req.recipientName}</h2>
-                    <span className="badge badge-error">{req.bloodGroup}</span>
-                  </div>
-                  <p className="text-sm">
-                    <span className="font-semibold">Hospital:</span> {req.hospitalName}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-semibold">Address:</span> {req.address}, {req.upazila}, {req.district}
-                  </p>
-                  <p className="text-sm"><span className="font-semibold">Date:</span> {req.donationDate}</p>
-                  <p className="text-sm"><span className="font-semibold">Time:</span> {req.donationTime}</p>
+          <RequestDesktopTable
+            requests={allRequests}
+            onStatusChange={handleStatus}
+            onDelete={handleDeleteOne}
+          />
 
-                  <span
-                    className={`badge ${
-                      req.donationStatus === "pending"
-                        ? "badge-warning"
-                        : req.donationStatus === "inprogress"
-                        ? "badge-info"
-                        : req.donationStatus === "done"
-                        ? "badge-success"
-                        : "badge-error"
-                    } capitalize`}
-                  >
-                    {req.donationStatus}
-                  </span>
+          <RequestMobileList
+            requests={allRequests}
+            onStatusChange={handleStatus}
+            onDelete={handleDeleteOne}
+          />
 
-                  {req.donationStatus === "inprogress" && (
-                    <div className="bg-gray-100 p-2 rounded-md text-sm">
-                      <p className="font-semibold">{req.requesterName}</p>
-                      <p>{req.requesterEmail}</p>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {req.donationStatus === "inprogress" && (
-                      <>
-                        <button
-                          onClick={() => handleStatus("done", req._id)}
-                          className="btn btn-success btn-sm"
-                        >
-                          Done
-                        </button>
-                        <button
-                          onClick={() => handleStatus("canceled", req._id)}
-                          className="btn btn-error btn-sm"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    )}
-                    <NavLink
-                      to={`/dashboard/donation-request-details-page/${req._id}`}
-                      className="btn btn-sm bg-black text-white"
-                    >
-                      <MdEdit />
-                    </NavLink>
-                    <NavLink
-                      to={`/dashboard/donation-details-page/${req._id}`}
-                      className="btn btn-sm bg-green-800 text-white"
-                    >
-                      Details
-                    </NavLink>
-                    <button
-                      onClick={() => handleDeleteOne(req._id)}
-                      className="btn btn-error btn-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-center text-gray-300">No donation requests found.</p>
-          )}
-        </div>
-
-        {/* 🔹 Desktop Table */}
-        <div className="hidden lg:block overflow-x-auto mt-6">
-          <table className="table table-zebra w-full text-white">
-            <thead>
-              <tr>
-                <th>Recipient</th>
-                <th>Blood Group</th>
-                <th>Hospital</th>
-                <th>Address</th>
-                <th>Date & Time</th>
-                <th>Status</th>
-                <th>Donor Info</th>
-                <th>Change Status</th>
-                <th>Edit Request</th>
-                <th>Delete</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {myRequests.length > 0 ? (
-                myRequests.map((req) => (
-                  <tr key={req._id}>
-                    <td>{req.recipientName}</td>
-                    <td><span className="badge badge-error">{req.bloodGroup}</span></td>
-                    <td>{req.hospitalName}</td>
-                    <td>{`${req.address || ""}, ${req.upazila}, ${req.district}`}</td>
-                    <td>{`${req.donationDate} at ${req.donationTime}`}</td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          req.donationStatus === "pending"
-                            ? "badge-warning"
-                            : req.donationStatus === "inprogress"
-                            ? "badge-info"
-                            : req.donationStatus === "done"
-                            ? "badge-success"
-                            : "badge-error"
-                        } capitalize`}
-                      >
-                        {req.donationStatus}
-                      </span>
-                    </td>
-                    <td>
-                      {req.donationStatus === "inprogress" && (
-                        <div>
-                          <p className="font-semibold">{req.requesterName}</p>
-                          <p>{req.requesterEmail}</p>
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      {req.donationStatus === "inprogress" && (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => handleStatus("done", req._id)}
-                            className="btn p-1 btn-success"
-                          >
-                            Done
-                          </button>
-                          <button
-                            onClick={() => handleStatus("canceled", req._id)}
-                            className="btn p-1 btn-error"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <NavLink to={`/dashboard/donation-request-details-page/${req._id}`}>
-                        <button className="p-1 bg-black text-white rounded-2xl">
-                          <MdEdit />
-                        </button>
-                      </NavLink>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => handleDeleteOne(req._id)}
-                        className="btn p-1 btn-error"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                    <td>
-                      <NavLink to={`/dashboard/donation-details-page/${req._id}`}>
-                        <button className="btn p-1 bg-green-900 text-white">
-                          Details
-                        </button>
-                      </NavLink>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="11" className="text-center text-gray-300">
-                    No donation requests found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <RequestPagination
+            currentPage={currentPage}
+            totalItems={totalCount}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSize={handlePageSize}
+          />
         </div>
       </motion.div>
     </div>

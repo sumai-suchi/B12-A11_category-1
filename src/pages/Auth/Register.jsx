@@ -5,13 +5,17 @@ import { AuthContext } from "../../AuthContext/AuthContext";
 import axios from "axios";
 import { FaStethoscope } from "react-icons/fa";
 import { motion } from "framer-motion";
+import useAxios from "../../hooks/useAxios";
+import Swal from "sweetalert2";
 const Register = () => {
   const { register: registerForm, handleSubmit, formState: { errors } } = useForm();
   const { SignUpWithEmailPassword, UpdateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const  axiosInstance=useAxios()
 
   const [upazilas, setUpazilas] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [error, setError] = useState("");
   const [selectedDistrictId, setSelectedDistrictId] = useState("");
 const [selectedDistrictName, setSelectedDistrictName] = useState("");
   useEffect(() => {
@@ -68,22 +72,25 @@ const handleFormData = async (data) => {
             photoURL: mainPhotoUrl,
           });
 
-          await axios.post(
-            "https://blooddonationserver.vercel.app/user",
+          await axiosInstance.post(
+            "/user",
             
             formData
           );
 
-          navigate("/");
+          navigate("/")
         },
 
         (error) => {
-          console.log(error);
+         
+          setError(error.message);
+          Swal.fire("Error", error.message, "error");
           alert("Location permission is required");
         }
       );
     }
   } catch (error) {
+      Swal.fire("Error", error.message, "error");
     console.error(error);
   }
 };
@@ -213,7 +220,7 @@ const filteredUpazilas = upazilas.filter(
     {...registerForm("upazila", { required: true })}
     className="select w-full"
   >
-    <option value="" disabled selected>
+    <option value="" disabled defaultValue>
       Select upazila
     </option>
 
