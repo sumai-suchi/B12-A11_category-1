@@ -6,7 +6,7 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Dashboard from "./pages/Dashboard";
 import AddRequest from "./pages/Dashboard/AddRequest";
-import PrivateRoute from "./components/shared/PrivateRoute";
+import PrivateRoute from "./Components/shared/PrivateRoute"
 import AllUser from "./pages/Dashboard/AllUser";
 import MyDonationRequest from "./pages/Dashboard/MyDonationRequest";
 import DashboardHome from "./pages/Dashboard/DashboardHome";
@@ -21,6 +21,9 @@ import ErrorPage from "./pages/Public/ErrorPage";
 import Donate from "./pages/Public/Donate";
 import SuccessPage from "./pages/Public/SuccessPage";
 import AboutPage from "./pages/AboutPage";
+import DonorEligibility from "./pages/Dashboard/DonorEligibility";
+import RequesterMessage from "./pages/Dashboard/RequesterMessage";
+import PersonalRequest from "./pages/Dashboard/PersonalRequest";
 
 const router = createBrowserRouter([
   {
@@ -93,8 +96,20 @@ const router = createBrowserRouter([
         element: <AllUser></AllUser>,
       },
       {
+        path : "donation-eligibility",
+        element : <DonorEligibility></DonorEligibility>
+      },
+      {
         path: "my-donation-request",
         element: <MyDonationRequest></MyDonationRequest>,
+      },
+      {
+           path :"donation-history",
+           element : <MyDonationRequest></MyDonationRequest>
+      },
+      {
+        path: "personal-requests",
+        element : <PersonalRequest></PersonalRequest>
       },
       {
         path: "donation-request-details-page/:id",
@@ -115,6 +130,10 @@ const router = createBrowserRouter([
       {
         path: "all-donation-request-volunteer",
         element: <VolSection></VolSection>,
+      },
+      {
+        path: "requester-message",
+        element: <RequesterMessage></RequesterMessage>,
       },
     ],
   },

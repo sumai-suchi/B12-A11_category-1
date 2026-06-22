@@ -15,7 +15,7 @@ const ChatModal = ({ donor, CurrentUser, closeModal }) => {
     const fetchMessages = async () => {
 
       const res = await fetch(
-        `http://localhost:5000/messages/?conversationId=${conversationId}`
+        `http://localhost:5000/ messages/?conversationId=${conversationId}`
       );
 
       const data = await res.json();
@@ -45,7 +45,7 @@ const ChatModal = ({ donor, CurrentUser, closeModal }) => {
       text,
     };
 
-    const res = await fetch("http://localhost:5000/messages", {
+    const res = await fetch("http://localhost:5000/ messages", {
       method: "POST",
       headers: {
         "content-type": "application/json",

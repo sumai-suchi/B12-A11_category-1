@@ -2,12 +2,13 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { MapPin, Droplet, Send } from 'lucide-react'; // Optional: for nice icons
-import ChatModal from "../modals/ChatModal";
+import HeroContactModal from "../modals/HeroContactModal";
 import { AuthContext } from '../../AuthContext/AuthContext';
 import axios from 'axios';
 
 const NearByRearchResult = ({ donors }) => {
-         const [openChat, setOpenChat] = useState(false);
+         const [selectedDonor, setSelectedDonor] = useState(null);
+         const [isModalOpen, setIsModalOpen] = useState(false);
          const {user}=useContext(AuthContext);
          console.log(user?.email)
   const [CurrentUser,setCurrentUser]=useState({})
@@ -90,26 +91,20 @@ const NearByRearchResult = ({ donors }) => {
 
             {/* Action Button */}
             <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 group"
-              onClick={() => setOpenChat(true)}>
+              onClick={() => { setSelectedDonor(donor); setIsModalOpen(true); }}>
               <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               Contact Donor
             </button>
            </div>
-
-             {
-        openChat && (
-          <ChatModal
-            donor={donor}
-           CurrentUser={CurrentUser}
-            closeModal={() => setOpenChat(false)}
-          />
-        )
-      }
         </div>
       ))}
 
-       
-        
+      {isModalOpen && selectedDonor && (
+        <HeroContactModal
+          donor={selectedDonor}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
